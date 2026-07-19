@@ -11,6 +11,8 @@ import { errorHandler } from "./middleware/errorHandler.js";
 import { notFound } from "./middleware/notFound.js";
 
 import healthRoutes from "./routes/health.routes.js";
+import authRoutes from "./routes/auth.routes.js";
+import doctorRoutes from "./routes/doctor.routes.js";
 
 const app = express();
 
@@ -43,6 +45,8 @@ if (env.NODE_ENV === "development") {
 }
 
 app.use("/api/v1", healthRoutes);
+app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/doctors", doctorRoutes);
 
 app.use(notFound);
 
