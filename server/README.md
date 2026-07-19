@@ -81,6 +81,55 @@ The base infrastructure has been set up with the following utilities, configurat
 
 ---
 
+## ✅ Authentication & Authorization (Phase 3)
+
+A complete, secure, and flexible Authentication & Authorization module built independent of the database implementation.
+
+### 1. Authentication Flow & Security
+- **Passwords**: Hashes and verifies passwords using `bcrypt`.
+- **JWT Architecture**: Implements access token generation and verification using `jsonwebtoken`. Prepared structure for future refresh token integration.
+- **Middleware**: 
+  - `authenticate.js`: Extracts Bearer token from the `Authorization` header, verifies the JWT, and attaches the decoded payload to `req.user`.
+
+### 2. Role-Based Access Control (RBAC)
+- **Middleware**: 
+  - `authorize.js`: A highly flexible RBAC middleware that grants access based on roles (`authorize("doctor", "admin")`).
+- Supported roles map directly to the frontend implementation: Doctor, Hospital, Ambulance, Admin.
+
+### 3. Dynamic Validation Schemas
+- Uses `express-validator` to strictly enforce request payloads.
+- Validates the unique fields required for each specific role (e.g., `licenseNumber` for doctors, `icuBeds` for hospitals) exactly matching the frontend requirements.
+
+### 4. Endpoints
+- `POST /api/v1/auth/register` (Public)
+- `POST /api/v1/auth/login` (Public)
+- `POST /api/v1/auth/logout` (Protected)
+- `GET /api/v1/auth/profile` (Protected)
+- `POST /api/v1/auth/refresh-token` (Public)
+
+---
+
+## ✅ Doctor Module (Phase 4)
+
+Provides APIs for Doctors to manage their profile, register patients, and initiate referrals.
+
+### 1. Doctor Profile
+- **Retrieval & Update**: Protected endpoints to get or update doctor details.
+
+### 2. Patient Management
+- **Registration**: Allows doctors to register new patients.
+- **Listing & Details**: Fetch patients under a doctor's care.
+
+### 3. Referrals
+- **Creation**: Initiate referrals to other hospitals/departments.
+- **Tracking**: Retrieve all referrals or specific referral details.
+
+### 4. Authorization & Validation
+- **Protection**: Every endpoint is strictly protected by `authenticate` and `authorize("doctor")`.
+- **Validation**: Strict payload validation using `express-validator` for patients, referrals, and profile updates.
+
+---
+
 ## 🚫 Development Constraints
 
 - **No Empty Scaffolding:** Files and folders are created *strictly* when needed. No unused placeholder files exist.
