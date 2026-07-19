@@ -1,55 +1,119 @@
 import * as React from "react"
 import { Link, useLocation } from "react-router-dom"
-import { Activity, LayoutDashboard, Users, Calendar, Settings, LogOut, FileText } from "lucide-react"
+import { Activity, LayoutDashboard, Users, Calendar, Settings, LogOut, FileText, UserSquare, Bed, Database, HeartPulse, Stethoscope, AlertTriangle, Map, MapPin, Building, Truck, ShieldCheck } from "lucide-react"
 import { cn } from "@/utils/cn"
+import { useAuth } from "@/hooks/useAuth"
 
-const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { name: 'Appointments', href: '/dashboard/appointments', icon: Calendar },
-  { name: 'Patients', href: '/dashboard/patients', icon: Users },
-  { name: 'Reports', href: '/dashboard/reports', icon: FileText },
+const hospitalNavigation = [
+  { name: 'Dashboard', href: '/dashboard/hospital', icon: LayoutDashboard },
+  { name: 'Hospital Profile', href: '/dashboard/hospital/profile', icon: UserSquare },
+  { name: 'ICU & Beds', href: '/dashboard/hospital/icu', icon: Bed },
+  { name: 'Resources', href: '/dashboard/hospital/resources', icon: Database },
+  { name: 'Doctors', href: '/dashboard/hospital/doctors', icon: Stethoscope },
+  { name: 'Referrals', href: '/dashboard/hospital/referrals', icon: FileText },
+  { name: 'Emergency Queue', href: '/dashboard/hospital/patients', icon: AlertTriangle },
+  { name: 'Analytics', href: '/dashboard/analytics', icon: Activity },
+  { name: 'Settings', href: '/dashboard/hospital/settings', icon: Settings },
+]
+
+const doctorNavigation = [
+  { name: 'Dashboard', href: '/dashboard/doctor', icon: LayoutDashboard },
+  { name: 'Register Patient', href: '/dashboard/doctor/patients/new', icon: Users },
+  { name: 'AI Severity', href: '/dashboard/doctor/severity', icon: Activity },
+  { name: 'New Referral', href: '/dashboard/doctor/referrals/new', icon: HeartPulse },
+  { name: 'Referral History', href: '/dashboard/doctor/referrals', icon: FileText },
+  { name: 'Notifications', href: '/dashboard/notifications', icon: Bed },
+  { name: 'Profile', href: '/dashboard/profile', icon: UserSquare },
+  { name: 'Settings', href: '/dashboard/settings', icon: Settings },
+]
+
+const ambulanceNavigation = [
+  { name: 'Dashboard', href: '/dashboard/ambulance', icon: LayoutDashboard },
+  { name: 'Available Requests', href: '/dashboard/ambulance/requests/available', icon: Activity },
+  { name: 'Assigned Requests', href: '/dashboard/ambulance/requests/assigned', icon: HeartPulse },
+  { name: 'Live Map', href: '/dashboard/ambulance/map', icon: Map },
+  { name: 'Route Details', href: '/dashboard/ambulance/route', icon: MapPin },
+  { name: 'Trip History', href: '/dashboard/ambulance/history', icon: FileText },
+  { name: 'Driver Profile', href: '/dashboard/profile', icon: UserSquare },
+  { name: 'Settings', href: '/dashboard/settings', icon: Settings },
+]
+
+const adminNavigation = [
+  { name: 'Dashboard', href: '/dashboard/admin', icon: LayoutDashboard },
+  { name: 'Hospitals', href: '/dashboard/admin/hospitals', icon: Building },
+  { name: 'Doctors', href: '/dashboard/admin/doctors', icon: Stethoscope },
+  { name: 'Ambulances', href: '/dashboard/admin/ambulances', icon: Truck },
+  { name: 'Patients', href: '/dashboard/admin/patients', icon: Users },
+  { name: 'Live Monitoring', href: '/dashboard/admin/monitoring', icon: HeartPulse },
+  { name: 'Analytics', href: '/dashboard/analytics', icon: Activity },
+  { name: 'Reports', href: '/dashboard/admin/reports', icon: FileText },
+  { name: 'User Roles', href: '/dashboard/admin/roles', icon: ShieldCheck },
   { name: 'Settings', href: '/dashboard/settings', icon: Settings },
 ]
 
 export function Sidebar() {
   const location = useLocation()
+  const { user, logout } = useAuth()
+
+  // Determine which navigation to show based on user role
+  const getNavigation = () => {
+    switch (user?.role) {
+      case 'hospital':
+        return hospitalNavigation;
+      case 'doctor':
+        return doctorNavigation;
+      case 'ambulance':
+        return ambulanceNavigation;
+      case 'admin':
+        return adminNavigation;
+      default:
+        return [];
+    }
+  }
+
+  const navigation = getNavigation();
 
   return (
-    <div className="hidden border-r glass-card md:block w-64 flex-shrink-0 min-h-screen transition-all duration-300">
+    <div className="hidden border-r border-white/10 glass-card bg-[#020617]/50 md:block w-64 flex-shrink-0 min-h-screen transition-all duration-300">
       <div className="flex h-full max-h-screen flex-col gap-2">
-        <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
+        <div className="flex h-14 items-center border-b border-white/10 px-4 lg:h-[60px] lg:px-6 bg-[#020617]">
           <Link to="/" className="flex items-center gap-2 font-semibold">
-            <Activity className="h-6 w-6 text-primary" />
-            <span className="">MedLink AI</span>
+            <Activity className="h-6 w-6 text-cyan-500" />
+            <span className="text-white text-lg tracking-tight">MedLink AI</span>
           </Link>
         </div>
-        <div className="flex-1 overflow-auto py-2">
-          <nav className="grid items-start px-2 text-sm font-medium lg:px-4 space-y-1">
+        <div className="flex-1 overflow-auto py-4">
+          <nav className="grid items-start px-2 text-sm font-medium lg:px-4 space-y-1.5">
             {navigation.map((item) => {
-              const isActive = location.pathname === item.href
+              const isActive = location.pathname === item.href || (location.pathname.startsWith(item.href) && item.href !== `/dashboard/${user?.role}`);
+
               return (
                 <Link
                   key={item.name}
                   to={item.href}
                   className={cn(
-                    "flex items-center gap-3 rounded-lg px-3 py-2 transition-all",
-                    isActive 
-                      ? "bg-primary text-primary-foreground hover:bg-primary/90" 
-                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                    "flex items-center gap-3 rounded-lg px-3 py-2.5 transition-all duration-200",
+                    isActive
+                      ? "bg-cyan-500/10 text-cyan-400 font-bold border border-cyan-500/20"
+                      : "text-slate-400 hover:bg-slate-800/50 hover:text-slate-200"
                   )}
                 >
-                  <item.icon className="h-4 w-4" />
+                  <item.icon className={cn("h-4 w-4", isActive ? "text-cyan-400" : "text-slate-500")} />
                   {item.name}
                 </Link>
               )
             })}
           </nav>
         </div>
-        <div className="mt-auto p-4">
-          <Link to="/auth/login" className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-all hover:bg-muted hover:text-foreground">
+        <div className="mt-auto p-4 border-t border-white/10">
+          <div className="flex items-center gap-3 rounded-lg px-3 py-2 mb-2 text-sm font-medium text-slate-400">
+            <UserSquare className="h-4 w-4 text-slate-500" />
+            <span className="truncate">{user?.email || 'User'}</span>
+          </div>
+          <button onClick={logout} className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-rose-500/80 transition-all hover:bg-rose-500/10 hover:text-rose-500">
             <LogOut className="h-4 w-4" />
             Logout
-          </Link>
+          </button>
         </div>
       </div>
     </div>
