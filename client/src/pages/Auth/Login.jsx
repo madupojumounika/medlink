@@ -3,16 +3,17 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, LogIn, Loader2 } from 'lucide-react';
 import { Button } from '@/components/common/Button';
 import { Input } from '@/components/common/Input';
 import { Label } from '@/components/common/Label';
 import { Checkbox } from '@/components/common/Checkbox';
+import { useAuth } from '@/hooks/useAuth';
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  password: z.string().min(1, 'Password is required'),
   rememberMe: z.boolean().optional(),
 });
 
@@ -20,6 +21,10 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { login } = useAuth();
 
   const {
     register,
@@ -40,17 +45,18 @@ export default function Login() {
     setIsLoading(true);
     setErrorMsg('');
 
-    setTimeout(() => {
+    try {
+      const user = await login(data.email, data.password);
+      
+      // Auto-redirect based on role
+      const redirectPath = location.state?.from?.pathname || `/dashboard/${user.role}`;
+      navigate(redirectPath, { replace: true });
+      
+    } catch (err) {
+      setErrorMsg(err.message || 'Invalid email or password');
+    } finally {
       setIsLoading(false);
-      console.log('Login data:', data);
-
-      if (data.email === 'error@test.com') {
-        setErrorMsg('Invalid email or password. Please try again.');
-      } else {
-
-        alert('Login successful! (Dummy)');
-      }
-    }, 1500);
+    }
   };
 
   return (
@@ -61,7 +67,7 @@ export default function Login() {
       className="flex flex-col space-y-6 w-full max-w-md mx-auto"
     >
       <div className="flex flex-col space-y-2 text-center">
-        <h1 className="text-3xl font-bold tracking-tight">Welcome back</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-white">Welcome back</h1>
         <p className="text-sm text-muted-foreground">
           Enter your credentials to access your account
         </p>
@@ -97,7 +103,7 @@ export default function Login() {
             <Label htmlFor="password">Password</Label>
             <Link
               to="/auth/forgot-password"
-              className="text-sm font-medium text-primary hover:underline"
+              className="text-sm font-medium text-cyan-400 hover:text-cyan-300 transition-colors"
             >
               Forgot password?
             </Link>
@@ -127,10 +133,10 @@ export default function Login() {
         </div>
 
         <div className="flex items-center space-x-2 pb-2">
-          <Checkbox 
-            id="rememberMe" 
+          <Checkbox
+            id="rememberMe"
             checked={rememberMe}
-            onChange={(e) => setValue('rememberMe', e.target.checked)}
+            onCheckedChange={(checked) => setValue('rememberMe', checked)}
             disabled={isLoading}
           />
           <Label htmlFor="rememberMe" className="font-normal cursor-pointer text-muted-foreground">
@@ -147,29 +153,9 @@ export default function Login() {
         </Button>
       </form>
 
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center">
-          <span className="w-full border-t" />
-        </div>
-        <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-background px-2 text-muted-foreground">
-            Or continue with
-          </span>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <Button variant="outline" disabled={isLoading} onClick={() => alert('Microsoft login placeholder')} className="hover:bg-primary/5 hover:border-primary/50 transition-all shadow-sm h-12">
-          <span className="font-extrabold text-blue-600 mr-2 text-lg leading-none">M</span> Microsoft
-        </Button>
-        <Button variant="outline" disabled={isLoading} onClick={() => alert('Google login placeholder')} className="hover:bg-primary/5 hover:border-primary/50 transition-all shadow-sm h-12">
-          <span className="font-extrabold text-red-500 mr-2 text-lg leading-none">G</span> Google
-        </Button>
-      </div>
-
-      <p className="text-center text-sm text-muted-foreground">
+      <p className="text-center text-sm text-muted-foreground mt-4">
         Don't have an account?{' '}
-        <Link to="/auth/register" className="font-semibold text-primary hover:underline">
+        <Link to="/auth/register" className="font-semibold text-cyan-400 hover:text-cyan-300 transition-colors">
           Sign up
         </Link>
       </p>

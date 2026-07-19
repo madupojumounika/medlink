@@ -1,36 +1,143 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
-import { Eye, EyeOff, Mail, Lock, User, UserPlus, Loader2, Hospital } from 'lucide-react';
+import { Link, useNavigate, useParams, Navigate } from 'react-router-dom';
+import { Eye, EyeOff, Mail, Lock, User, Loader2, Phone, Briefcase, Hash, Building, Truck, ShieldCheck, MapPin } from 'lucide-react';
 import { Button } from '@/components/common/Button';
 import { Input } from '@/components/common/Input';
 import { Label } from '@/components/common/Label';
+import { useAuth } from '@/hooks/useAuth';
 
-const registerSchema = z.object({
-  fullName: z.string().min(2, 'Full name must be at least 2 characters'),
-  email: z.string().email('Please enter a valid email address'),
-  organization: z.string().min(2, 'Organization name is required'),
-  password: z.string().min(8, 'Password must be at least 8 characters')
-    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-    .regex(/[0-9]/, 'Password must contain at least one number'),
-  confirmPassword: z.string(),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
-});
+const getRoleConfig = (role) => {
+  switch (role) {
+    case 'doctor':
+      return {
+        title: 'Doctor Registration',
+        schema: {
+          fullName: z.string().min(2, 'Full name is required'),
+          email: z.string().email('Valid email is required'),
+          password: z.string().min(8, 'Minimum 8 characters'),
+          confirmPassword: z.string(),
+          phone: z.string().min(10, 'Valid phone number is required'),
+          licenseNumber: z.string().min(4, 'License number is required'),
+          specialization: z.string().min(2, 'Specialization is required'),
+          hospitalName: z.string().min(2, 'Hospital name is required'),
+          experience: z.string().min(1, 'Years of experience is required')
+        },
+        fields: [
+          { name: 'fullName', label: 'Full Name', icon: User, type: 'text', placeholder: 'Dr. Jane Doe' },
+          { name: 'email', label: 'Email', icon: Mail, type: 'email', placeholder: 'jane.doe@example.com' },
+          { name: 'phone', label: 'Phone Number', icon: Phone, type: 'tel', placeholder: '+1 234 567 8900' },
+          { name: 'licenseNumber', label: 'Medical License Number', icon: Hash, type: 'text', placeholder: 'MD-1234567' },
+          { name: 'specialization', label: 'Specialization', icon: Briefcase, type: 'text', placeholder: 'Cardiology' },
+          { name: 'hospitalName', label: 'Hospital Name', icon: Building, type: 'text', placeholder: 'General Medical Center' },
+          { name: 'experience', label: 'Years of Experience', icon: Hash, type: 'number', placeholder: '5' }
+        ]
+      };
+    case 'hospital':
+      return {
+        title: 'Hospital Registration',
+        schema: {
+          hospitalName: z.string().min(2, 'Hospital name is required'),
+          registrationNumber: z.string().min(4, 'Registration number is required'),
+          adminName: z.string().min(2, 'Administrator name is required'),
+          email: z.string().email('Valid email is required'),
+          password: z.string().min(8, 'Minimum 8 characters'),
+          confirmPassword: z.string(),
+          phone: z.string().min(10, 'Valid phone number is required'),
+          address: z.string().min(5, 'Full address is required'),
+          icuBeds: z.string().min(1, 'Number of ICU beds is required'),
+          emergencyContact: z.string().min(10, 'Emergency contact is required')
+        },
+        fields: [
+          { name: 'hospitalName', label: 'Hospital Name', icon: Building, type: 'text', placeholder: 'City General Hospital' },
+          { name: 'registrationNumber', label: 'Registration Number', icon: Hash, type: 'text', placeholder: 'HOSP-987654' },
+          { name: 'adminName', label: 'Administrator Name', icon: User, type: 'text', placeholder: 'John Smith' },
+          { name: 'email', label: 'Admin Email', icon: Mail, type: 'email', placeholder: 'admin@hospital.org' },
+          { name: 'phone', label: 'Primary Phone', icon: Phone, type: 'tel', placeholder: '+1 234 567 8900' },
+          { name: 'emergencyContact', label: 'Emergency Contact Number', icon: Phone, type: 'tel', placeholder: '+1 234 567 9111' },
+          { name: 'address', label: 'Full Address', icon: MapPin, type: 'text', placeholder: '123 Medical Way, City, State' },
+          { name: 'icuBeds', label: 'Number of ICU Beds', icon: Hash, type: 'number', placeholder: '20' }
+        ]
+      };
+    case 'ambulance':
+      return {
+        title: 'Ambulance Registration',
+        schema: {
+          driverName: z.string().min(2, 'Driver name is required'),
+          email: z.string().email('Valid email is required'),
+          password: z.string().min(8, 'Minimum 8 characters'),
+          confirmPassword: z.string(),
+          phone: z.string().min(10, 'Valid phone number is required'),
+          licenseNumber: z.string().min(4, 'Driver license is required'),
+          registrationNumber: z.string().min(4, 'Ambulance registration is required'),
+          organization: z.string().min(2, 'Organization is required'),
+          experience: z.string().min(1, 'Years of experience is required')
+        },
+        fields: [
+          { name: 'driverName', label: 'Driver Name', icon: User, type: 'text', placeholder: 'Mike Johnson' },
+          { name: 'email', label: 'Email', icon: Mail, type: 'email', placeholder: 'mike@ems.org' },
+          { name: 'phone', label: 'Phone Number', icon: Phone, type: 'tel', placeholder: '+1 234 567 8900' },
+          { name: 'licenseNumber', label: 'Driver License Number', icon: Hash, type: 'text', placeholder: 'DL-9876543' },
+          { name: 'registrationNumber', label: 'Ambulance Registration', icon: Truck, type: 'text', placeholder: 'AMB-456' },
+          { name: 'organization', label: 'Organization / Hospital', icon: Building, type: 'text', placeholder: 'City EMS Services' },
+          { name: 'experience', label: 'Years of Experience', icon: Hash, type: 'number', placeholder: '3' }
+        ]
+      };
+    case 'admin':
+      return {
+        title: 'System Admin Registration',
+        schema: {
+          fullName: z.string().min(2, 'Full name is required'),
+          email: z.string().email('Valid email is required'),
+          password: z.string().min(8, 'Minimum 8 characters'),
+          confirmPassword: z.string(),
+          phone: z.string().min(10, 'Valid phone number is required'),
+          organization: z.string().min(2, 'Organization is required'),
+          employeeId: z.string().min(2, 'Employee ID is required'),
+          adminCode: z.string().min(6, 'Admin code is required')
+        },
+        fields: [
+          { name: 'fullName', label: 'Full Name', icon: User, type: 'text', placeholder: 'Sarah Connor' },
+          { name: 'email', label: 'Email', icon: Mail, type: 'email', placeholder: 'sarah.c@medlink.ai' },
+          { name: 'phone', label: 'Phone Number', icon: Phone, type: 'tel', placeholder: '+1 234 567 8900' },
+          { name: 'organization', label: 'Organization', icon: Building, type: 'text', placeholder: 'MedLink Systems' },
+          { name: 'employeeId', label: 'Employee ID', icon: Hash, type: 'text', placeholder: 'EMP-10293' },
+          { name: 'adminCode', label: 'Admin Access Code', icon: ShieldCheck, type: 'text', placeholder: 'Enter provided code' }
+        ]
+      };
+    default:
+      return null;
+  }
+};
 
 export default function Register() {
+  const { role } = useParams();
+  const navigate = useNavigate();
+  const { register: registerAuth } = useAuth();
+  
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
-  const [successMsg, setSuccessMsg] = useState('');
+  
+  const config = getRoleConfig(role);
+
+  // Fallback if accessed with invalid role
+  if (!config) {
+    return <Navigate to="/auth/register" replace />;
+  }
+
+  // Create schema dynamically with confirmPassword validation
+  const registerSchema = z.object(config.schema).refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  });
 
   const {
-    register,
+    register: formRegister,
     handleSubmit,
     formState: { errors },
   } = useForm({
@@ -40,18 +147,14 @@ export default function Register() {
   const onSubmit = async (data) => {
     setIsLoading(true);
     setErrorMsg('');
-    setSuccessMsg('');
-
-    setTimeout(() => {
+    try {
+      await registerAuth(data, role);
+      navigate('/auth/login');
+    } catch (err) {
+      setErrorMsg(err.message || 'Registration failed');
+    } finally {
       setIsLoading(false);
-      console.log('Registration data:', data);
-
-      if (data.email === 'error@test.com') {
-        setErrorMsg('Email is already registered.');
-      } else {
-        setSuccessMsg('Registration successful! Please verify your email.');
-      }
-    }, 1500);
+    }
   };
 
   return (
@@ -59,74 +162,43 @@ export default function Register() {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="flex flex-col space-y-6 w-full max-w-md mx-auto"
+      className="flex flex-col w-full max-w-2xl mx-auto"
     >
-      <div className="flex flex-col space-y-2 text-center">
-        <h1 className="text-3xl font-bold tracking-tight">Create an account</h1>
+      <div className="flex flex-col space-y-2 text-center mb-8">
+        <h1 className="text-3xl font-bold tracking-tight text-white">{config.title}</h1>
         <p className="text-sm text-muted-foreground">
-          Join the MedLink AI network to transform your clinical operations
+          Fill in your details below to create your {role} account.
         </p>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {errorMsg && (
           <div className="p-3 text-sm font-medium text-destructive bg-destructive/10 rounded-md border border-destructive/20 text-center">
             {errorMsg}
           </div>
         )}
-        {successMsg && (
-          <div className="p-3 text-sm font-medium text-green-600 bg-green-50 rounded-md border border-green-200 text-center dark:bg-green-950/50 dark:border-green-900 dark:text-green-400">
-            {successMsg}
-          </div>
-        )}
 
-        <div className="space-y-2">
-          <Label htmlFor="fullName">Full Name</Label>
-          <div className="relative">
-            <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input
-              id="fullName"
-              placeholder="Dr. Jane Doe"
-              className="pl-9"
-              disabled={isLoading}
-              {...register('fullName')}
-            />
-          </div>
-          {errors.fullName && <p className="text-sm font-medium text-destructive">{errors.fullName.message}</p>}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {config.fields.map((field) => (
+            <div key={field.name} className="space-y-2">
+              <Label htmlFor={field.name}>{field.label}</Label>
+              <div className="relative">
+                <field.icon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id={field.name}
+                  type={field.type}
+                  placeholder={field.placeholder}
+                  className="pl-9"
+                  disabled={isLoading}
+                  {...formRegister(field.name)}
+                />
+              </div>
+              {errors[field.name] && <p className="text-xs font-medium text-destructive">{errors[field.name].message}</p>}
+            </div>
+          ))}
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="email">Work Email</Label>
-          <div className="relative">
-            <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input
-              id="email"
-              type="email"
-              placeholder="jane.doe@hospital.org"
-              className="pl-9"
-              disabled={isLoading}
-              {...register('email')}
-            />
-          </div>
-          {errors.email && <p className="text-sm font-medium text-destructive">{errors.email.message}</p>}
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="organization">Organization / Hospital</Label>
-          <div className="relative">
-            <Hospital className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input
-              id="organization"
-              placeholder="General Medical Center"
-              className="pl-9"
-              disabled={isLoading}
-              {...register('organization')}
-            />
-          </div>
-          {errors.organization && <p className="text-sm font-medium text-destructive">{errors.organization.message}</p>}
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
             <div className="relative">
@@ -137,7 +209,7 @@ export default function Register() {
                 placeholder="••••••••"
                 className="pl-9 pr-10"
                 disabled={isLoading}
-                {...register('password')}
+                {...formRegister('password')}
               />
               <button
                 type="button"
@@ -152,7 +224,7 @@ export default function Register() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="confirmPassword">Confirm</Label>
+            <Label htmlFor="confirmPassword">Confirm Password</Label>
             <div className="relative">
               <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
@@ -161,7 +233,7 @@ export default function Register() {
                 placeholder="••••••••"
                 className="pl-9 pr-10"
                 disabled={isLoading}
-                {...register('confirmPassword')}
+                {...formRegister('confirmPassword')}
               />
               <button
                 type="button"
@@ -176,18 +248,23 @@ export default function Register() {
           </div>
         </div>
 
-        <Button type="submit" className="w-full mt-4" disabled={isLoading}>
-          {isLoading ? (
-            <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Creating account...</>
-          ) : (
-            <><UserPlus className="mr-2 h-4 w-4" /> Sign Up</>
-          )}
-        </Button>
+        <div className="flex gap-4 pt-4">
+          <Button variant="outline" type="button" onClick={() => navigate('/auth/register')} className="w-full">
+            Back to Roles
+          </Button>
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading ? (
+              <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Creating account...</>
+            ) : (
+              'Create Account'
+            )}
+          </Button>
+        </div>
       </form>
 
-      <p className="text-center text-sm text-muted-foreground">
+      <p className="text-center text-sm text-muted-foreground mt-8">
         Already have an account?{' '}
-        <Link to="/auth/login" className="font-semibold text-primary hover:underline">
+        <Link to="/auth/login" className="font-semibold text-cyan-400 hover:text-cyan-300 transition-colors">
           Sign in
         </Link>
       </p>
