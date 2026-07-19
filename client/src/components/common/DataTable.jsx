@@ -11,19 +11,19 @@ export function DataTable({ columns, data, onRowClick, searchable = true, placeh
           <SearchBar placeholder={placeholder} />
         </div>
       )}
-      <div className="rounded-lg border border-white/10 bg-slate-900/50 backdrop-blur-sm overflow-hidden">
+      <div className="rounded-lg border border-border bg-card shadow-sm overflow-hidden">
         <TableWrapper>
           <TableHeader>
-            <TableRow className="hover:bg-transparent border-white/5 bg-slate-950/50">
+            <TableRow className="hover:bg-transparent border-border bg-muted/50">
               {columns.map((col, index) => (
-                <TableHead key={index} className="text-slate-400 font-semibold">{col.header}</TableHead>
+                <TableHead key={index} className="text-muted-foreground font-semibold">{col.header}</TableHead>
               ))}
             </TableRow>
           </TableHeader>
           <TableBody>
             {data.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center text-slate-500">
+                <TableCell colSpan={columns.length} className="h-24 text-center text-muted-foreground">
                   No results found.
                 </TableCell>
               </TableRow>
@@ -31,11 +31,11 @@ export function DataTable({ columns, data, onRowClick, searchable = true, placeh
               data.map((row, rowIndex) => (
                 <TableRow 
                   key={row.id || rowIndex} 
-                  className={`border-white/5 hover:bg-slate-800/50 transition-colors ${onRowClick ? 'cursor-pointer' : ''}`}
+                  className={`border-border hover:bg-muted/50 transition-colors ${onRowClick ? 'cursor-pointer' : ''}`}
                   onClick={() => onRowClick && onRowClick(row)}
                 >
                   {columns.map((col, colIndex) => (
-                    <TableCell key={colIndex} className="text-slate-300">
+                    <TableCell key={colIndex} className="text-foreground">
                       {col.cell ? col.cell(row) : row[col.accessorKey]}
                     </TableCell>
                   ))}

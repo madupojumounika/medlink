@@ -3,17 +3,17 @@ import { Card, CardContent } from './Card';
 
 export function MetricCard({ title, value, description, icon: Icon, trend }) {
   return (
-    <Card className="bg-slate-900/50 border-white/5 backdrop-blur-sm overflow-hidden relative group">
-      <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/5 rounded-full blur-[40px] group-hover:bg-cyan-500/10 transition-colors pointer-events-none"></div>
+    <Card className="bg-card border-border shadow-sm overflow-hidden relative group">
+      <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/5 rounded-full blur-[40px] transition-colors pointer-events-none"></div>
       <CardContent className="p-6 relative z-10">
         <div className="flex justify-between items-start">
           <div className="space-y-2">
-            <p className="text-sm font-medium text-slate-400">{title}</p>
-            <h3 className="text-3xl font-bold text-white">{value}</h3>
+            <p className="text-sm font-medium text-muted-foreground">{title}</p>
+            <h3 className="text-3xl font-bold text-foreground">{value}</h3>
           </div>
           {Icon && (
-            <div className="p-3 bg-slate-800/80 rounded-xl border border-white/5">
-              <Icon className="w-5 h-5 text-cyan-400" />
+            <div className="p-3 bg-muted rounded-xl border border-border">
+              <Icon className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
             </div>
           )}
         </div>

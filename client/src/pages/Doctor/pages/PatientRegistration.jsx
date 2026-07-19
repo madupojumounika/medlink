@@ -10,11 +10,11 @@ export default function PatientRegistration() {
     <div className="space-y-6 max-w-4xl mx-auto">
       <PageHeader title="Register New Patient" description="Enter patient details for emergency tracking and triage." />
 
-      <motion.form initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-8 bg-slate-900/50 backdrop-blur-sm border border-white/5 p-8 rounded-3xl">
+      <motion.form initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-8 bg-card border border-border shadow-sm p-8 rounded-3xl">
         
         {/* Personal Info */}
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-white border-b border-white/10 pb-2">Personal Information</h3>
+          <h3 className="text-lg font-semibold text-card-foreground border-b border-border pb-2">Personal Information</h3>
           <div className="grid md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <Label>First Name</Label>
@@ -30,7 +30,7 @@ export default function PatientRegistration() {
             </div>
             <div className="space-y-2">
               <Label>Gender</Label>
-              <select className="w-full h-10 px-3 py-2 bg-slate-950 border border-white/10 rounded-md text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500">
+              <select className="w-full h-10 px-3 py-2 bg-background border border-input rounded-md text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
                 <option>Male</option>
                 <option>Female</option>
                 <option>Other</option>
@@ -41,11 +41,11 @@ export default function PatientRegistration() {
 
         {/* Medical History */}
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-white border-b border-white/10 pb-2">Current Status</h3>
+          <h3 className="text-lg font-semibold text-card-foreground border-b border-border pb-2">Current Status</h3>
           <div className="space-y-4">
             <div className="space-y-2">
               <Label>Chief Complaint / Symptoms</Label>
-              <textarea className="w-full min-h-[100px] p-3 bg-slate-950 border border-white/10 rounded-md text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500" placeholder="Describe the primary symptoms..."></textarea>
+              <textarea className="w-full min-h-[100px] p-3 bg-background border border-input rounded-md text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2" placeholder="Describe the primary symptoms..."></textarea>
             </div>
             <div className="grid md:grid-cols-3 gap-6">
               <div className="space-y-2">
@@ -64,7 +64,7 @@ export default function PatientRegistration() {
           </div>
         </div>
 
-        <div className="flex justify-end gap-4 pt-4 border-t border-white/10">
+        <div className="flex justify-end gap-4 pt-4 border-t border-border">
           <Button variant="outline">Cancel</Button>
           <Button className="bg-cyan-600 hover:bg-cyan-500 text-white">Register Patient</Button>
         </div>

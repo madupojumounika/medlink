@@ -7,8 +7,8 @@ const statusStyles = {
   pending: "bg-amber-500/10 text-amber-500 border-amber-500/20",
   en_route: "bg-cyan-500/10 text-cyan-500 border-cyan-500/20",
   available: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
-  occupied: "bg-slate-500/10 text-slate-400 border-slate-500/20",
-  default: "bg-slate-800 text-slate-300 border-slate-700"
+  occupied: "bg-muted text-muted-foreground border-border",
+  default: "bg-muted text-muted-foreground border-border"
 };
 
 export function StatusBadge({ status, children, className }) {

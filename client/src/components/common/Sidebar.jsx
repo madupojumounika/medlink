@@ -74,12 +74,12 @@ export function Sidebar() {
   const navigation = getNavigation();
 
   return (
-    <div className="hidden border-r border-white/10 glass-card bg-[#020617]/50 md:block w-64 flex-shrink-0 min-h-screen transition-all duration-300">
+    <div className="hidden border-r border-border bg-card md:block w-64 flex-shrink-0 min-h-screen transition-all duration-300">
       <div className="flex h-full max-h-screen flex-col gap-2">
-        <div className="flex h-14 items-center border-b border-white/10 px-4 lg:h-[60px] lg:px-6 bg-[#020617]">
+        <div className="flex h-14 items-center border-b border-border px-4 lg:h-[60px] lg:px-6 bg-card">
           <Link to="/" className="flex items-center gap-2 font-semibold">
             <Activity className="h-6 w-6 text-cyan-500" />
-            <span className="text-white text-lg tracking-tight">MedLink AI</span>
+            <span className="text-foreground text-lg tracking-tight">MedLink AI</span>
           </Link>
         </div>
         <div className="flex-1 overflow-auto py-4">
@@ -94,20 +94,20 @@ export function Sidebar() {
                   className={cn(
                     "flex items-center gap-3 rounded-lg px-3 py-2.5 transition-all duration-200",
                     isActive
-                      ? "bg-cyan-500/10 text-cyan-400 font-bold border border-cyan-500/20"
-                      : "text-slate-400 hover:bg-slate-800/50 hover:text-slate-200"
+                      ? "bg-primary/10 text-primary font-bold border border-primary/20"
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
                   )}
                 >
-                  <item.icon className={cn("h-4 w-4", isActive ? "text-cyan-400" : "text-slate-500")} />
+                  <item.icon className={cn("h-4 w-4", isActive ? "text-primary" : "text-muted-foreground")} />
                   {item.name}
                 </Link>
               )
             })}
           </nav>
         </div>
-        <div className="mt-auto p-4 border-t border-white/10">
-          <div className="flex items-center gap-3 rounded-lg px-3 py-2 mb-2 text-sm font-medium text-slate-400">
-            <UserSquare className="h-4 w-4 text-slate-500" />
+        <div className="mt-auto p-4 border-t border-border">
+          <div className="flex items-center gap-3 rounded-lg px-3 py-2 mb-2 text-sm font-medium text-muted-foreground">
+            <UserSquare className="h-4 w-4 text-muted-foreground" />
             <span className="truncate">{user?.email || 'User'}</span>
           </div>
           <button onClick={logout} className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-rose-500/80 transition-all hover:bg-rose-500/10 hover:text-rose-500">

@@ -24,24 +24,24 @@ export default function Notifications() {
     <div className="space-y-6 max-w-4xl mx-auto">
       <PageHeader title="Notifications" description="Important alerts and system updates." />
 
-      <div className="bg-slate-900/50 backdrop-blur-sm border border-white/5 rounded-2xl overflow-hidden">
+      <div className="bg-card border border-border shadow-sm rounded-2xl overflow-hidden">
         {notifications.map((notif, i) => (
           <motion.div 
             key={notif.id}
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: i * 0.1 }}
-            className={`p-6 border-b border-white/5 flex gap-4 transition-colors hover:bg-slate-800/50 ${!notif.read ? 'bg-slate-800/30' : ''}`}
+            className={`p-6 border-b border-border flex gap-4 transition-colors hover:bg-background ${!notif.read ? 'bg-background shadow-sm' : 'bg-background'}`}
           >
-            <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${!notif.read ? 'bg-white/10' : 'bg-slate-950 border border-white/5'}`}>
+            <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${!notif.read ? 'bg-background border border-border shadow-sm' : 'bg-background border border-border'}`}>
               {getIcon(notif.type)}
             </div>
             <div className="flex-1">
               <div className="flex justify-between items-start mb-1">
-                <h4 className={`text-base font-semibold ${!notif.read ? 'text-white' : 'text-slate-300'}`}>{notif.title}</h4>
-                <span className="text-xs text-slate-500">{notif.time}</span>
+                <h4 className={`text-base font-semibold ${!notif.read ? 'text-card-foreground' : 'text-muted-foreground'}`}>{notif.title}</h4>
+                <span className="text-xs text-muted-foreground">{notif.time}</span>
               </div>
-              <p className="text-slate-400 text-sm">{notif.desc}</p>
+              <p className="text-muted-foreground text-sm">{notif.desc}</p>
             </div>
             {!notif.read && (
               <div className="w-2 h-2 rounded-full bg-cyan-500 mt-2 shrink-0 shadow-[0_0_10px_rgba(6,182,212,0.8)]"></div>

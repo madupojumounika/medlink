@@ -44,13 +44,13 @@ export default function DoctorDashboard() {
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-slate-900/50 backdrop-blur-sm border border-white/5 rounded-2xl p-6">
-          <h3 className="text-lg font-semibold text-white mb-4">Today's Patients</h3>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-card border rounded-2xl p-6 shadow-sm">
+          <h3 className="text-lg font-semibold text-card-foreground mb-4">Today's Patients</h3>
           <DataTable columns={patientColumns} data={todayPatients} searchable={false} />
         </motion.div>
         
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-slate-900/50 backdrop-blur-sm border border-white/5 rounded-2xl p-6">
-          <h3 className="text-lg font-semibold text-white mb-4">Active Outbound Referrals</h3>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-card border rounded-2xl p-6 shadow-sm">
+          <h3 className="text-lg font-semibold text-card-foreground mb-4">Active Outbound Referrals</h3>
           <DataTable columns={referralColumns} data={activeReferrals} searchable={false} />
         </motion.div>
       </div>

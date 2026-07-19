@@ -28,15 +28,15 @@ export default function NotificationsCenter() {
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <PageHeader title="Notifications" description="Stay updated on emergencies, referrals, and system alerts." />
-        <Button variant="outline" className="text-slate-300">Mark all as read</Button>
+        <Button variant="outline" className="text-muted-foreground">Mark all as read</Button>
       </div>
 
       <div className="flex items-center gap-4 mb-6">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input placeholder="Search notifications..." className="pl-10" />
         </div>
-        <select className="h-10 px-3 py-2 bg-slate-950 border border-white/10 rounded-md text-sm text-slate-200">
+        <select className="h-10 px-3 py-2 bg-background border border-input rounded-md text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring">
           <option>All Types</option>
           <option>Critical Alerts</option>
           <option>Referrals</option>
@@ -51,7 +51,7 @@ export default function NotificationsCenter() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.05 }}
-            className={`flex items-start gap-4 p-5 rounded-2xl border ${notif.read ? 'bg-slate-900/50 border-white/5' : 'bg-slate-900 border-white/10'} hover:border-white/20 transition-colors cursor-pointer relative`}
+            className={`flex items-start gap-4 p-5 rounded-2xl border ${notif.read ? 'bg-card border-border' : 'bg-background border-border shadow-sm'} hover:border-input transition-colors cursor-pointer relative`}
           >
             {!notif.read && <div className="absolute top-6 right-6 w-2.5 h-2.5 bg-cyan-500 rounded-full shadow-[0_0_8px_rgba(6,182,212,0.6)]"></div>}
             
@@ -59,10 +59,10 @@ export default function NotificationsCenter() {
             
             <div className="flex-1 pr-6">
               <div className="flex justify-between items-start mb-1">
-                <h4 className={`text-sm font-semibold ${notif.read ? 'text-slate-300' : 'text-white'}`}>{notif.title}</h4>
+                <h4 className={`text-sm font-semibold ${notif.read ? 'text-muted-foreground' : 'text-foreground'}`}>{notif.title}</h4>
               </div>
-              <p className={`text-sm ${notif.read ? 'text-slate-500' : 'text-slate-300'}`}>{notif.message}</p>
-              <p className="text-xs text-slate-500 mt-2">{notif.time}</p>
+              <p className={`text-sm ${notif.read ? 'text-muted-foreground/70' : 'text-muted-foreground'}`}>{notif.message}</p>
+              <p className="text-xs text-muted-foreground/50 mt-2">{notif.time}</p>
             </div>
           </motion.div>
         ))}
