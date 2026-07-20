@@ -159,6 +159,35 @@ Provides APIs for Hospitals to manage their profile, resources, verify incoming 
 
 ---
 
+## ✅ Ambulance Module (Phase 6)
+
+Provides APIs for Ambulances to manage their profile, driver details, availability status, and track assignments.
+
+### 1. Profile Management
+- **Retrieval & Update**: Protected endpoints to get or update ambulance and driver details.
+- **Validation**: Ensures ambulance number, driver name, driver license, phone, and organization are provided.
+
+### 2. Status Updates
+- **Availability**: Manage real-time availability (`Available`, `Busy`, `Offline`), current location, and vehicle condition.
+
+### 3. Assignment Handling
+- **Review**: Retrieve active assignments and past assignments.
+- **Action**: Dedicated endpoints to securely `accept`, `reject`, `start`, or `complete` assignments with optional remarks.
+
+### 4. Trip History
+- **Retrieval**: List all historical trips for the ambulance.
+
+### 5. Authorization & Folder Structure
+- **Protection**: Every endpoint is strictly protected by `authenticate` and `authorize("ambulance")`.
+- **Folder Structure**: Follows the strict layering:
+  - `routes/ambulance.routes.js`
+  - `controllers/ambulance.controller.js`
+  - `services/ambulance.service.js`
+  - `repositories/ambulance.repository.js`
+  - `validations/ambulance.validation.js`
+
+---
+
 ## 🚫 Development Constraints
 
 - **No Empty Scaffolding:** Files and folders are created *strictly* when needed. No unused placeholder files exist.
