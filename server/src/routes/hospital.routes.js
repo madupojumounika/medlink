@@ -1,0 +1,45 @@
+import { Router } from "express";
+import { hospitalController } from "../controllers/hospital.controller.js";
+import {
+  profileValidation,
+  resourcesValidation,
+  referralActionValidation,
+  validate
+} from "../validations/hospital.validation.js";
+import { authenticate } from "../middleware/authenticate.js";
+import { authorize } from "../middleware/authorize.js";
+
+const router = Router();
+
+// Protect all hospital routes
+router.use(authenticate, authorize("hospital"));
+
+// Profile
+router.get("/profile", hospitalController.getProfile);
+router.put("/profile", profileValidation, validate, hospitalController.updateProfile);
+
+// Resources
+router.get("/resources", hospitalController.getResources);
+router.put("/resources", resourcesValidation, validate, hospitalController.updateResources);
+
+// Referrals
+router.get("/referrals", hospitalController.getReferrals);
+router.get("/referrals/:id", hospitalController.getReferralById);
+
+router.put(
+  "/referrals/:id/accept",
+  referralActionValidation,
+  validate,
+  hospitalController.acceptReferral
+);
+router.put(
+  "/referrals/:id/reject",
+  referralActionValidation,
+  validate,
+  hospitalController.rejectReferral
+);
+
+// Doctors
+router.get("/doctors", hospitalController.getDoctors);
+
+export default router;

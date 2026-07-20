@@ -130,6 +130,35 @@ Provides APIs for Doctors to manage their profile, register patients, and initia
 
 ---
 
+## ✅ Hospital Module (Phase 5)
+
+Provides APIs for Hospitals to manage their profile, resources, verify incoming referrals, and list their doctors.
+
+### 1. Hospital Profile
+- **Retrieval & Update**: Protected endpoints to get or update hospital details.
+- **Validation**: Ensures hospital name, registration number, phone, email, address, and emergency contact are provided.
+
+### 2. Resource Management
+- **Tracking & Update**: Endpoints to manage total beds, available beds, ICU beds, available ICU beds, oxygen beds, and ventilators.
+
+### 3. Referral Management
+- **Review**: Retrieve pending or historical referrals.
+- **Action**: Dedicated endpoints to securely `accept` or `reject` incoming referrals with optional remarks.
+
+### 4. Doctor Listing
+- **Retrieval**: List all doctors associated with the hospital.
+
+### 5. Authorization & Folder Structure
+- **Protection**: Every endpoint is strictly protected by `authenticate` and `authorize("hospital")`.
+- **Folder Structure**: Follows the strict layering:
+  - `routes/hospital.routes.js`
+  - `controllers/hospital.controller.js`
+  - `services/hospital.service.js`
+  - `repositories/hospital.repository.js`
+  - `validations/hospital.validation.js`
+
+---
+
 ## 🚫 Development Constraints
 
 - **No Empty Scaffolding:** Files and folders are created *strictly* when needed. No unused placeholder files exist.
