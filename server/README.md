@@ -188,6 +188,35 @@ Provides APIs for Ambulances to manage their profile, driver details, availabili
 
 ---
 
+## ✅ Admin Module (Phase 7)
+
+Provides APIs for Administrators to manage system-wide entities, configurations, and oversee platform analytics.
+
+### 1. Dashboard Overview
+- **Retrieval**: Get high-level aggregated data for platform analytics.
+
+### 2. User & Role Management
+- **Users**: List, retrieve details, update, or delete general system users.
+- **Doctors, Hospitals, Ambulances**: List, retrieve details, or update module-specific records.
+
+### 3. System Configuration
+- **Settings**: Retrieve and update system-wide settings like application name, maintenance mode, and emergency contacts.
+
+### 4. Reporting
+- **Analytics**: Retrieve reports based on type, start date, and end date for platform health and business metrics.
+
+### 5. Authorization & Folder Structure
+- **Protection**: Every endpoint is strictly protected by `authenticate` and `authorize("admin")`.
+- **Validation**: Strict payload validation for user updates, system settings, and report generation parameters.
+- **Folder Structure**:
+  - `routes/admin.routes.js`
+  - `controllers/admin.controller.js`
+  - `services/admin.service.js`
+  - `repositories/admin.repository.js`
+  - `validations/admin.validation.js`
+
+---
+
 ## 🚫 Development Constraints
 
 - **No Empty Scaffolding:** Files and folders are created *strictly* when needed. No unused placeholder files exist.
