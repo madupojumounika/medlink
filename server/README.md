@@ -159,6 +159,64 @@ Provides APIs for Hospitals to manage their profile, resources, verify incoming 
 
 ---
 
+## ✅ Ambulance Module (Phase 6)
+
+Provides APIs for Ambulances to manage their profile, driver details, availability status, and track assignments.
+
+### 1. Profile Management
+- **Retrieval & Update**: Protected endpoints to get or update ambulance and driver details.
+- **Validation**: Ensures ambulance number, driver name, driver license, phone, and organization are provided.
+
+### 2. Status Updates
+- **Availability**: Manage real-time availability (`Available`, `Busy`, `Offline`), current location, and vehicle condition.
+
+### 3. Assignment Handling
+- **Review**: Retrieve active assignments and past assignments.
+- **Action**: Dedicated endpoints to securely `accept`, `reject`, `start`, or `complete` assignments with optional remarks.
+
+### 4. Trip History
+- **Retrieval**: List all historical trips for the ambulance.
+
+### 5. Authorization & Folder Structure
+- **Protection**: Every endpoint is strictly protected by `authenticate` and `authorize("ambulance")`.
+- **Folder Structure**: Follows the strict layering:
+  - `routes/ambulance.routes.js`
+  - `controllers/ambulance.controller.js`
+  - `services/ambulance.service.js`
+  - `repositories/ambulance.repository.js`
+  - `validations/ambulance.validation.js`
+
+---
+
+## ✅ Admin Module (Phase 7)
+
+Provides APIs for Administrators to manage system-wide entities, configurations, and oversee platform analytics.
+
+### 1. Dashboard Overview
+- **Retrieval**: Get high-level aggregated data for platform analytics.
+
+### 2. User & Role Management
+- **Users**: List, retrieve details, update, or delete general system users.
+- **Doctors, Hospitals, Ambulances**: List, retrieve details, or update module-specific records.
+
+### 3. System Configuration
+- **Settings**: Retrieve and update system-wide settings like application name, maintenance mode, and emergency contacts.
+
+### 4. Reporting
+- **Analytics**: Retrieve reports based on type, start date, and end date for platform health and business metrics.
+
+### 5. Authorization & Folder Structure
+- **Protection**: Every endpoint is strictly protected by `authenticate` and `authorize("admin")`.
+- **Validation**: Strict payload validation for user updates, system settings, and report generation parameters.
+- **Folder Structure**:
+  - `routes/admin.routes.js`
+  - `controllers/admin.controller.js`
+  - `services/admin.service.js`
+  - `repositories/admin.repository.js`
+  - `validations/admin.validation.js`
+
+---
+
 ## 🚫 Development Constraints
 
 - **No Empty Scaffolding:** Files and folders are created *strictly* when needed. No unused placeholder files exist.
