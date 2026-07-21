@@ -47,6 +47,33 @@ class HospitalController {
     const result = await hospitalService.getDoctors(req.user.id);
     return apiResponse(res, 200, true, result.message, result.data);
   });
+
+  // Generic CRUD
+  createHospital = asyncHandler(async (req, res) => {
+    const result = await hospitalService.createHospital(req.body);
+    return apiResponse(res, 201, true, result.message, result.data);
+  });
+
+  getAllHospitals = asyncHandler(async (req, res) => {
+    const result = await hospitalService.getAllHospitals();
+    return apiResponse(res, 200, true, result.message, result.data);
+  });
+
+  getHospitalById = asyncHandler(async (req, res) => {
+    const result = await hospitalService.getHospitalById(req.params.id);
+    return apiResponse(res, 200, true, result.message, result.data);
+  });
+
+  updateHospital = asyncHandler(async (req, res) => {
+    const result = await hospitalService.updateHospital(req.params.id, req.body);
+    return apiResponse(res, 200, true, result.message, result.data);
+  });
+
+  deleteHospital = asyncHandler(async (req, res) => {
+    const result = await hospitalService.deleteHospital(req.params.id);
+    return apiResponse(res, 200, true, result.message, result.data);
+  });
 }
+
 
 export const hospitalController = new HospitalController();

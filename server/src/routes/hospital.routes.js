@@ -42,4 +42,11 @@ router.put(
 // Doctors
 router.get("/doctors", hospitalController.getDoctors);
 
+// Generic CRUD
+router.post("/", hospitalController.createHospital);
+router.get("/", hospitalController.getAllHospitals);
+router.get("/:id", hospitalController.getHospitalById);
+router.put("/:id", hospitalController.updateHospital);
+router.delete("/:id", hospitalController.deleteHospital);
+
 export default router;
