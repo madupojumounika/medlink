@@ -7,8 +7,8 @@ class PatientService {
     return { message: "Patient created successfully", data: patient };
   }
 
-  async getAllPatients() {
-    const patients = await patientRepository.getAllPatients();
+  async getAllPatients(query = {}) {
+    const patients = await patientRepository.getAllPatients(query);
     return { message: "Patients retrieved successfully", data: patients };
   }
 

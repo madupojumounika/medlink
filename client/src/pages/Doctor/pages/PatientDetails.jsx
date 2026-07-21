@@ -4,8 +4,30 @@ import { StatusBadge } from '@/components/common/StatusBadge';
 import { Button } from '@/components/common/Button';
 import { Activity, Clock, FileText, Upload } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useParams, useNavigate } from 'react-router-dom';
+import { api } from '@/lib/api';
 
 export default function PatientDetails() {
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const [needsReferral, setNeedsReferral] = React.useState(false);
+
+  React.useEffect(() => {
+    const fetchPatient = async () => {
+      try {
+        // Attempt to fetch real patient data if API supports it
+        const res = await api.get(`/patients/${id || 'mock-id'}`);
+        if (res.data?.data?.needsReferral) {
+          setNeedsReferral(true);
+        }
+      } catch (err) {
+        // Fallback for prototype if endpoint doesn't exist or fails
+        console.warn('Could not fetch patient details', err);
+      }
+    };
+    fetchPatient();
+  }, [id]);
+
   return (
     <div className="space-y-6 max-w-6xl mx-auto">
       <div className="flex justify-between items-start">
@@ -14,7 +36,11 @@ export default function PatientDetails() {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" className="border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/10 hover:text-cyan-300">Run AI Severity Check</Button>
-          <Button className="bg-rose-600 hover:bg-rose-500 text-white">Create Referral</Button>
+          {needsReferral ? (
+            <Button disabled className="bg-slate-700 text-slate-300 opacity-80 cursor-not-allowed">✓ Referral Requested</Button>
+          ) : (
+            <Button onClick={() => navigate('/dashboard/doctor/referrals/new')} className="bg-rose-600 hover:bg-rose-500 text-white">Request Referral</Button>
+          )}
         </div>
       </div>
 

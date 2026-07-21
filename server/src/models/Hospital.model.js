@@ -53,6 +53,14 @@ const hospitalSchema = new mongoose.Schema(
     isActive: {
       type: Boolean,
       default: true,
+      index: true,
+    },
+    deletedAt: {
+      type: Date,
+    },
+    deletedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
     },
   },
   {
@@ -60,4 +68,7 @@ const hospitalSchema = new mongoose.Schema(
   },
 );
 
+hospitalSchema.index({ location: "2dsphere" });
+
 export default mongoose.model("Hospital", hospitalSchema);
+

@@ -12,11 +12,7 @@ export const patientValidation = [
   body("spo2").optional().isNumeric(),
 ];
 
-export const referralValidation = [
-  body("hospital").notEmpty().withMessage("Destination hospital is required"),
-  body("transport").notEmpty().withMessage("Transport allocation is required"),
-  body("notes").optional(),
-];
+
 
 export const profileUpdateValidation = [
   body("firstName").notEmpty().withMessage("First name is required"),

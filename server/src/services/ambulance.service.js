@@ -1,48 +1,66 @@
 import { ambulanceRepository } from "../repositories/ambulance.repository.js";
+import { ApiError } from "../utils/ApiError.js";
+import { REFERRAL_STATUS } from "../constants/referral.js";
+
+const getPaginationOptions = (query) => {
+  const page = parseInt(query.page, 10) || 1;
+  const limit = parseInt(query.limit, 10) || 10;
+  const skip = (page - 1) * limit;
+  const sort = query.sort ? { [query.sort]: query.order === "desc" ? -1 : 1 } : { createdAt: -1 };
+  return { page, limit, skip, sort };
+};
 
 class AmbulanceService {
   async getAmbulanceProfile(ambulanceId) {
-    return { message: "Ambulance profile retrieved successfully (Pending DB)", data: {} };
+    throw new ApiError(501, "Not Implemented");
   }
 
   async updateAmbulanceProfile(ambulanceId, profileData) {
-    return { message: "Ambulance profile updated successfully (Pending DB)", data: profileData };
+    throw new ApiError(501, "Not Implemented");
   }
 
   async getStatus(ambulanceId) {
-    return { message: "Ambulance status retrieved successfully (Pending DB)", data: {} };
+    throw new ApiError(501, "Not Implemented");
   }
 
   async updateStatus(ambulanceId, statusData) {
-    return { message: "Ambulance status updated successfully (Pending DB)", data: statusData };
+    throw new ApiError(501, "Not Implemented");
   }
 
-  async getAssignments(ambulanceId, query) {
-    return { message: "Assignments retrieved successfully (Pending DB)", data: [] };
+  async getAssignments(ambulanceId, queryParams = {}) {
+    const options = getPaginationOptions(queryParams);
+    const query = { status: REFERRAL_STATUS.ACCEPTED };
+
+    const { data, total } = await ambulanceRepository.getAssignments(query, options);
+    return { 
+      message: "Assignments retrieved successfully", 
+      data,
+      meta: { total, page: options.page, limit: options.limit }
+    };
   }
 
   async getAssignmentById(ambulanceId, assignmentId) {
-    return { message: "Assignment retrieved successfully (Pending DB)", data: { id: assignmentId } };
+    throw new ApiError(501, "Not Implemented");
   }
 
   async acceptAssignment(ambulanceId, assignmentId, remarks) {
-    return { message: "Assignment accepted successfully (Pending DB)", data: { id: assignmentId, remarks } };
+    throw new ApiError(501, "Not Implemented");
   }
 
   async rejectAssignment(ambulanceId, assignmentId, remarks) {
-    return { message: "Assignment rejected successfully (Pending DB)", data: { id: assignmentId, remarks } };
+    throw new ApiError(501, "Not Implemented");
   }
 
   async startTrip(ambulanceId, assignmentId) {
-    return { message: "Trip started successfully (Pending DB)", data: { id: assignmentId } };
+    throw new ApiError(501, "Not Implemented");
   }
 
   async completeTrip(ambulanceId, assignmentId, remarks) {
-    return { message: "Trip completed successfully (Pending DB)", data: { id: assignmentId, remarks } };
+    throw new ApiError(501, "Not Implemented");
   }
 
   async getTrips(ambulanceId, query) {
-    return { message: "Trips retrieved successfully (Pending DB)", data: [] };
+    throw new ApiError(501, "Not Implemented");
   }
 }
 

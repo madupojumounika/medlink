@@ -45,10 +45,31 @@ const patientSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Hospital",
     },
+    needsReferral: {
+      type: Boolean,
+      default: false,
+      index: true,
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
+      index: true,
+    },
+    deletedAt: {
+      type: Date,
+    },
+    deletedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
   },
   {
     timestamps: true,
   },
 );
 
+patientSchema.index({ hospitalId: 1 });
+patientSchema.index({ doctorId: 1 });
+
 export default mongoose.model("Patient", patientSchema);
+

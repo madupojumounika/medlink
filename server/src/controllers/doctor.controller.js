@@ -19,8 +19,8 @@ class DoctorController {
   });
 
   getPatients = asyncHandler(async (req, res) => {
-    const result = await doctorService.getPatients(req.user.id);
-    return apiResponse(res, 200, true, result.message, result.data);
+    const result = await doctorService.getPatients(req.user.id, req.query);
+    return apiResponse(res, 200, true, result.message, result.data, null, result.meta);
   });
 
   getPatientById = asyncHandler(async (req, res) => {
@@ -33,14 +33,10 @@ class DoctorController {
     return apiResponse(res, 200, true, result.message, result.data);
   });
 
-  createReferral = asyncHandler(async (req, res) => {
-    const result = await doctorService.createReferral(req.user.id, req.body);
-    return apiResponse(res, 201, true, result.message, result.data);
-  });
 
   getReferrals = asyncHandler(async (req, res) => {
-    const result = await doctorService.getReferrals(req.user.id);
-    return apiResponse(res, 200, true, result.message, result.data);
+    const result = await doctorService.getReferrals(req.user.id, req.query);
+    return apiResponse(res, 200, true, result.message, result.data, null, result.meta);
   });
 
   getReferralById = asyncHandler(async (req, res) => {

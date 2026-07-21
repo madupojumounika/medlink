@@ -4,6 +4,7 @@ import {
   profileValidation,
   resourcesValidation,
   referralActionValidation,
+  referralCreationValidation,
   validate
 } from "../validations/hospital.validation.js";
 import { authenticate } from "../middleware/authenticate.js";
@@ -23,6 +24,7 @@ router.get("/resources", hospitalController.getResources);
 router.put("/resources", resourcesValidation, validate, hospitalController.updateResources);
 
 // Referrals
+router.post("/referrals", referralCreationValidation, validate, hospitalController.createReferral);
 router.get("/referrals", hospitalController.getReferrals);
 router.get("/referrals/:id", hospitalController.getReferralById);
 

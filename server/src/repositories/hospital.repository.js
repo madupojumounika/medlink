@@ -1,40 +1,78 @@
 import Hospital from "../models/Hospital.model.js";
+import HospitalResource from "../models/HospitalResource.model.js";
+import Referral from "../models/Referral.model.js";
+import DoctorProfile from "../models/DoctorProfile.model.js";
 
 class HospitalRepository {
-  async getHospitalProfile(hospitalId) {
-    throw new Error("Database implementation pending");
+  async getHospitalByUserId(userId) {
+    return await Hospital.findOne({ userId, isActive: true }).lean();
   }
 
-  async updateHospitalProfile(hospitalId, profileData) {
-    throw new Error("Database implementation pending");
+  async getHospitalProfile(userId) {
+    return await Hospital.findOne({ userId, isActive: true }).lean();
+  }
+
+  async updateHospitalProfile(userId, profileData) {
+    return await Hospital.findOneAndUpdate({ userId, isActive: true }, profileData, { new: true, runValidators: true });
   }
 
   async getResources(hospitalId) {
-    throw new Error("Database implementation pending");
+    return await HospitalResource.findOne({ hospitalId }).lean();
   }
 
   async updateResources(hospitalId, resourcesData) {
-    throw new Error("Database implementation pending");
+    return await HospitalResource.findOneAndUpdate({ hospitalId }, resourcesData, { new: true, runValidators: true, upsert: true });
   }
 
-  async getReferrals(hospitalId, query) {
-    throw new Error("Database implementation pending");
+  async createReferral(referralData, session) {
+    const referral = new Referral(referralData);
+    if (session) {
+      return await referral.save({ session });
+    }
+    return await referral.save();
   }
 
-  async getReferralById(hospitalId, referralId) {
-    throw new Error("Database implementation pending");
+  async getReferrals(query, options) {
+    const { sort, skip, limit } = options;
+    const data = await Referral.find({ ...query, isActive: true })
+      .populate("patientId", "name age gender")
+      .populate("doctorId", "specialization")
+      .populate("fromHospitalId", "hospitalName")
+      .populate("toHospitalId", "hospitalName")
+      .sort(sort)
+      .skip(skip)
+      .limit(limit)
+      .lean();
+    
+    const total = await Referral.countDocuments({ ...query, isActive: true });
+    return { data, total };
   }
 
-  async acceptReferral(hospitalId, referralId, remarks) {
-    throw new Error("Database implementation pending");
+  async getReferralById(referralId) {
+    return await Referral.findOne({ _id: referralId, isActive: true })
+      .populate("patientId", "name age gender phone bloodGroup allergies existingConditions")
+      .populate("doctorId", "specialization phone")
+      .populate("fromHospitalId", "hospitalName email phone address district state")
+      .populate("toHospitalId", "hospitalName email phone address district state")
+      .lean();
   }
 
-  async rejectReferral(hospitalId, referralId, remarks) {
-    throw new Error("Database implementation pending");
+  async updateReferralStatus(referralId, updateData, session) {
+    if (session) {
+      return await Referral.findOneAndUpdate({ _id: referralId, isActive: true }, updateData, { new: true, runValidators: true, session });
+    }
+    return await Referral.findOneAndUpdate({ _id: referralId, isActive: true }, updateData, { new: true, runValidators: true });
   }
 
-  async getDoctors(hospitalId) {
-    throw new Error("Database implementation pending");
+  async getDoctors(query, options) {
+    const { sort, skip, limit } = options;
+    const data = await DoctorProfile.find({ ...query, isActive: true })
+      .sort(sort)
+      .skip(skip)
+      .limit(limit)
+      .lean();
+    const total = await DoctorProfile.countDocuments({ ...query, isActive: true });
+    return { data, total };
   }
 
   async createHospital(hospitalData) {
@@ -47,15 +85,15 @@ class HospitalRepository {
   }
 
   async getHospitalById(id) {
-    return await Hospital.findById(id);
+    return await Hospital.findOne({ _id: id, isActive: true });
   }
 
   async updateHospital(id, updateData) {
-    return await Hospital.findByIdAndUpdate(id, updateData, { new: true, runValidators: true });
+    return await Hospital.findOneAndUpdate({ _id: id, isActive: true }, updateData, { new: true, runValidators: true });
   }
 
   async deleteHospital(id) {
-    return await Hospital.findByIdAndUpdate(id, { isActive: false }, { new: true });
+    return await Hospital.findByIdAndUpdate(id, { isActive: false, deletedAt: new Date() }, { new: true });
   }
 }
 

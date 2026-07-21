@@ -6,8 +6,8 @@ class PatientRepository {
     return await patient.save();
   }
 
-  async getAllPatients() {
-    return await Patient.find();
+  async getAllPatients(query = {}) {
+    return await Patient.find(query);
   }
 
   async getPatientById(id) {

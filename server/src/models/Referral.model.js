@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { REFERRAL_STATUS, REFERRAL_SEVERITY, REFERRAL_PRIORITY } from "../constants/referral.js";
 
 const referralSchema = new mongoose.Schema(
   {
@@ -23,17 +24,17 @@ const referralSchema = new mongoose.Schema(
     toHospitalId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Hospital",
-      required: true,
+      required: false,
       index: true,
     },
     severity: {
       type: String,
-      enum: ["Low", "Medium", "High", "Critical"],
+      enum: Object.values(REFERRAL_SEVERITY),
       required: true,
     },
     priority: {
       type: String,
-      enum: ["Normal", "Urgent", "Critical"],
+      enum: Object.values(REFERRAL_PRIORITY),
       required: true,
     },
     diagnosis: {
@@ -43,8 +44,8 @@ const referralSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["Pending", "Accepted", "In Transit", "Completed", "Rejected"],
-      default: "Pending",
+      enum: Object.values(REFERRAL_STATUS),
+      default: REFERRAL_STATUS.PENDING,
       index: true,
     },
     notes: {
@@ -57,6 +58,18 @@ const referralSchema = new mongoose.Schema(
     completedAt: {
       type: Date,
     },
+    isActive: {
+      type: Boolean,
+      default: true,
+      index: true,
+    },
+    deletedAt: {
+      type: Date,
+    },
+    deletedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
   },
   {
     timestamps: true,
@@ -64,3 +77,4 @@ const referralSchema = new mongoose.Schema(
 );
 
 export default mongoose.model("Referral", referralSchema);
+

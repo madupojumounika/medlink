@@ -22,10 +22,15 @@ class HospitalController {
     const result = await hospitalService.updateResources(req.user.id, req.body);
     return apiResponse(res, 200, true, result.message, result.data);
   });
+  createReferral = asyncHandler(async (req, res) => {
+    const result = await hospitalService.createReferral(req.user.id, req.body);
+    return apiResponse(res, 201, true, result.message, result.data);
+  });
+
 
   getReferrals = asyncHandler(async (req, res) => {
     const result = await hospitalService.getReferrals(req.user.id, req.query);
-    return apiResponse(res, 200, true, result.message, result.data);
+    return apiResponse(res, 200, true, result.message, result.data, null, result.meta);
   });
 
   getReferralById = asyncHandler(async (req, res) => {
@@ -44,8 +49,8 @@ class HospitalController {
   });
 
   getDoctors = asyncHandler(async (req, res) => {
-    const result = await hospitalService.getDoctors(req.user.id);
-    return apiResponse(res, 200, true, result.message, result.data);
+    const result = await hospitalService.getDoctors(req.user.id, req.query);
+    return apiResponse(res, 200, true, result.message, result.data, null, result.meta);
   });
 
   // Generic CRUD

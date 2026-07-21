@@ -25,3 +25,13 @@ export const referralActionValidation = [
   
   body("action").optional().isIn(["accept", "reject"]).withMessage("Action must be accept or reject")
 ];
+
+export const referralCreationValidation = [
+  body("patientId").notEmpty().withMessage("Patient ID is required"),
+  body("doctorId").notEmpty().withMessage("Doctor ID is required"),
+  body("toHospitalId").optional().isString(),
+  body("severity").isIn(["Low", "Medium", "High", "Critical"]).withMessage("Valid severity is required"),
+  body("priority").isIn(["Normal", "Urgent", "Critical"]).withMessage("Valid priority is required"),
+  body("diagnosis").notEmpty().withMessage("Diagnosis is required"),
+  body("notes").optional().isString(),
+];

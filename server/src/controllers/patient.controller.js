@@ -9,7 +9,7 @@ class PatientController {
   });
 
   getAllPatients = asyncHandler(async (req, res) => {
-    const result = await patientService.getAllPatients();
+    const result = await patientService.getAllPatients(req.query);
     return apiResponse(res, 200, true, result.message, result.data);
   });
 

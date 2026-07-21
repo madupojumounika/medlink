@@ -1,38 +1,62 @@
+import DoctorProfile from "../models/DoctorProfile.model.js";
+import Patient from "../models/Patient.model.js";
+import Referral from "../models/Referral.model.js";
+
 export class DoctorRepository {
-  async getDoctorProfile(doctorId) {
-    return null;
+  async getDoctorProfileByUserId(userId) {
+    return await DoctorProfile.findOne({ userId, isActive: true }).populate("hospitalId", "name email phone").lean();
   }
 
-  async updateDoctorProfile(doctorId, updateData) {
-    return null;
+  async updateDoctorProfile(userId, updateData) {
+    return await DoctorProfile.findOneAndUpdate({ userId, isActive: true }, updateData, { new: true, runValidators: true });
   }
 
-  async createPatient(doctorId, patientData) {
-    return null;
+  async createPatient(patientData) {
+    const patient = new Patient(patientData);
+    return await patient.save();
   }
 
-  async getPatients(doctorId) {
-    return null;
+  async getPatients(query, options) {
+    const { sort, skip, limit } = options;
+    const data = await Patient.find({ ...query, isActive: true })
+      .sort(sort)
+      .skip(skip)
+      .limit(limit)
+      .lean();
+    
+    const total = await Patient.countDocuments({ ...query, isActive: true });
+    return { data, total };
   }
 
-  async getPatientById(doctorId, patientId) {
-    return null;
+  async getPatientById(patientId) {
+    return await Patient.findOne({ _id: patientId, isActive: true }).lean();
   }
 
-  async updatePatient(doctorId, patientId, updateData) {
-    return null;
+  async updatePatient(patientId, updateData) {
+    return await Patient.findOneAndUpdate({ _id: patientId, isActive: true }, updateData, { new: true, runValidators: true });
   }
 
-  async createReferral(doctorId, referralData) {
-    return null;
+  async getReferrals(query, options) {
+    const { sort, skip, limit } = options;
+    const data = await Referral.find({ ...query, isActive: true })
+      .populate("patientId", "name age gender")
+      .populate("fromHospitalId", "name email")
+      .populate("toHospitalId", "name email")
+      .sort(sort)
+      .skip(skip)
+      .limit(limit)
+      .lean();
+      
+    const total = await Referral.countDocuments({ ...query, isActive: true });
+    return { data, total };
   }
 
-  async getReferrals(doctorId) {
-    return null;
-  }
-
-  async getReferralById(doctorId, referralId) {
-    return null;
+  async getReferralById(referralId) {
+    return await Referral.findOne({ _id: referralId, isActive: true })
+      .populate("patientId", "name age gender bloodGroup allergies existingConditions phone")
+      .populate("fromHospitalId", "name email phone")
+      .populate("toHospitalId", "name email phone")
+      .lean();
   }
 }
 

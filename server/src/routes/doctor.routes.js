@@ -2,7 +2,6 @@ import { Router } from "express";
 import { doctorController } from "../controllers/doctor.controller.js";
 import {
   patientValidation,
-  referralValidation,
   profileUpdateValidation,
   validate
 } from "../validations/doctor.validation.js";
@@ -21,7 +20,7 @@ router.get("/patients", doctorController.getPatients);
 router.get("/patients/:id", doctorController.getPatientById);
 router.put("/patients/:id", patientValidation, validate, doctorController.updatePatient);
 
-router.post("/referrals", referralValidation, validate, doctorController.createReferral);
+
 router.get("/referrals", doctorController.getReferrals);
 router.get("/referrals/:id", doctorController.getReferralById);
 

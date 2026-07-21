@@ -38,6 +38,14 @@ const doctorProfileSchema = new mongoose.Schema(
     isActive: {
       type: Boolean,
       default: true,
+      index: true,
+    },
+    deletedAt: {
+      type: Date,
+    },
+    deletedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
     },
   },
   {
@@ -45,4 +53,7 @@ const doctorProfileSchema = new mongoose.Schema(
   },
 );
 
+doctorProfileSchema.index({ hospitalId: 1 });
+
 export default mongoose.model("DoctorProfile", doctorProfileSchema);
+

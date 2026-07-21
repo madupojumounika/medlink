@@ -25,7 +25,7 @@ class AmbulanceController {
 
   getAssignments = asyncHandler(async (req, res) => {
     const result = await ambulanceService.getAssignments(req.user.id, req.query);
-    return apiResponse(res, 200, true, result.message, result.data);
+    return apiResponse(res, 200, true, result.message, result.data, null, result.meta);
   });
 
   getAssignmentById = asyncHandler(async (req, res) => {
