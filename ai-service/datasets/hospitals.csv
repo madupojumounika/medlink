@@ -1,0 +1,101 @@
+hospital_id,hospital_name,latitude,longitude,specialty,icu_beds_available,ventilators_available,available_doctors,occupancy_percentage,emergency_supported,hospital_rating
+H001,City Care Pediatrics Center 1,40.822164,-74.232643,Pediatrics,14,6,6,48.26,True,4.1
+H002,Metro General Hospital 2,40.818111,-74.214275,Pediatrics,27,40,61,84.38,True,4.6
+H003,Metro General Hospital 3,40.385698,-73.716242,Neurology,38,55,45,40.07,False,4.8
+H004,City Care Neurology Center 4,40.637448,-74.19317,Neurology,14,15,24,96.94,True,4.9
+H005,City Care Neurology Center 5,40.347889,-74.376342,Neurology,11,10,22,70.18,True,5.0
+H006,City Care Trauma Center 6,41.124222,-74.362562,Trauma,15,6,9,75.73,True,4.8
+H007,Metro General Hospital 7,40.985518,-73.760969,General,33,15,78,81.79,True,3.9
+H008,Metro General Hospital 8,40.579102,-74.173993,Pediatrics,42,42,31,91.29,False,4.0
+H009,Metro General Hospital 9,41.059805,-73.611458,Trauma,28,17,46,63.94,True,3.4
+H010,Metro General Hospital 10,40.714421,-73.890714,Pediatrics,27,39,99,77.75,False,3.4
+H011,Metro General Hospital 11,40.962457,-73.623731,Orthopedics,36,49,75,88.54,False,3.1
+H012,Metro General Hospital 12,41.109374,-74.333445,General,40,23,40,92.27,True,4.4
+H013,City Care Cardiology Center 13,40.31951,-74.12174,Cardiology,8,0,19,83.85,False,4.0
+H014,Metro General Hospital 14,40.716921,-74.111599,Pediatrics,20,58,23,60.57,True,4.7
+H015,City Care Neurology Center 15,40.558928,-73.810713,Neurology,0,3,28,70.74,False,3.8
+H016,City Care Trauma Center 16,40.578103,-73.846179,Trauma,7,17,6,58.11,True,3.9
+H017,City Care Cardiology Center 17,41.073337,-73.986149,Cardiology,5,10,8,67.91,False,4.0
+H018,City Care Trauma Center 18,40.60975,-73.58477,Trauma,2,17,25,44.22,True,4.4
+H019,City Care Pediatrics Center 19,40.808915,-73.728307,Pediatrics,8,17,13,91.81,True,4.8
+H020,City Care Orthopedics Center 20,41.160179,-73.687512,Orthopedics,4,17,27,90.63,False,4.5
+H021,City Care Pediatrics Center 21,40.637679,-74.339473,Pediatrics,2,11,20,52.73,False,3.4
+H022,City Care General Center 22,40.913262,-73.809316,General,15,4,10,50.45,True,4.6
+H023,City Care Neurology Center 23,40.933423,-73.586737,Neurology,5,12,30,67.05,False,3.1
+H024,Metro General Hospital 24,41.029065,-74.051109,Neurology,25,24,100,94.17,True,3.7
+H025,City Care Trauma Center 25,40.882469,-74.315221,Trauma,4,2,14,43.46,True,3.5
+H026,City Care Orthopedics Center 26,40.536848,-73.872373,Orthopedics,7,12,21,71.63,False,3.9
+H027,Metro General Hospital 27,40.314577,-73.934132,Trauma,39,15,20,65.43,True,3.9
+H028,City Care Neurology Center 28,40.283443,-73.87489,Neurology,11,3,21,41.68,False,4.9
+H029,Metro General Hospital 29,40.878087,-73.81268,General,29,59,68,67.42,True,3.1
+H030,Metro General Hospital 30,40.410501,-74.152017,Trauma,49,41,29,74.29,True,3.5
+H031,City Care General Center 31,40.509153,-74.017052,General,9,0,27,43.41,True,5.0
+H032,City Care Trauma Center 32,41.051852,-74.061169,Trauma,13,2,23,70.09,True,4.4
+H033,Metro General Hospital 33,40.98247,-73.602692,Trauma,47,43,98,90.72,True,4.2
+H034,Metro General Hospital 34,40.586875,-73.93777,Cardiology,47,52,38,70.98,False,3.5
+H035,City Care Trauma Center 35,40.880947,-74.383525,Trauma,7,2,5,57.8,True,3.3
+H036,City Care Cardiology Center 36,40.420319,-73.852864,Cardiology,15,10,24,87.63,False,4.3
+H037,Metro General Hospital 37,41.155724,-74.106167,Trauma,35,55,61,40.6,True,4.0
+H038,City Care Orthopedics Center 38,40.574794,-73.893044,Orthopedics,10,18,26,60.67,True,3.9
+H039,City Care Pediatrics Center 39,40.778637,-73.703755,Pediatrics,13,14,26,79.74,True,4.6
+H040,Metro General Hospital 40,40.370352,-73.743589,Orthopedics,16,24,100,98.91,True,3.1
+H041,City Care Orthopedics Center 41,41.088763,-73.66692,Orthopedics,5,14,26,48.54,True,3.7
+H042,Metro General Hospital 42,40.928827,-73.786967,Pediatrics,32,31,87,96.74,False,3.9
+H043,City Care General Center 43,40.924866,-73.595687,General,14,14,24,50.96,True,3.4
+H044,City Care Orthopedics Center 44,40.662636,-73.712872,Orthopedics,9,1,8,75.3,True,4.2
+H045,City Care Neurology Center 45,40.298459,-73.813589,Neurology,9,10,5,62.03,False,3.3
+H046,City Care Pediatrics Center 46,40.518564,-73.689647,Pediatrics,4,6,22,95.14,True,4.3
+H047,Metro General Hospital 47,40.875595,-73.704517,Cardiology,43,39,54,72.91,False,4.6
+H048,City Care General Center 48,40.890664,-73.607223,General,2,2,30,58.23,True,3.4
+H049,City Care Cardiology Center 49,40.786594,-74.289215,Cardiology,10,16,22,42.38,True,4.4
+H050,Metro General Hospital 50,40.792897,-74.188522,Cardiology,34,35,22,62.89,False,4.6
+H051,Metro General Hospital 51,40.848246,-73.984846,Cardiology,44,58,77,74.78,False,4.8
+H052,City Care General Center 52,40.901224,-73.791942,General,11,13,11,84.24,True,3.7
+H053,City Care Orthopedics Center 53,40.458471,-73.832461,Orthopedics,5,6,20,70.42,False,3.2
+H054,Metro General Hospital 54,40.8984,-74.096268,General,25,37,71,61.26,True,3.0
+H055,City Care Orthopedics Center 55,41.027926,-73.559958,Orthopedics,11,10,21,84.62,True,4.1
+H056,City Care Trauma Center 56,40.762643,-74.244783,Trauma,3,4,26,45.94,True,4.5
+H057,Metro General Hospital 57,40.604609,-74.238915,General,23,42,100,48.22,True,4.1
+H058,Metro General Hospital 58,40.663536,-74.206178,Neurology,34,38,90,96.14,True,4.1
+H059,City Care General Center 59,40.52718,-74.423909,General,11,15,8,75.13,True,4.4
+H060,City Care Trauma Center 60,41.08447,-74.143991,Trauma,13,6,18,82.14,True,5.0
+H061,City Care General Center 61,40.5858,-73.81062,General,11,10,25,67.65,True,4.9
+H062,Metro General Hospital 62,40.653779,-73.889693,Trauma,47,24,40,80.01,True,4.3
+H063,City Care General Center 63,40.786216,-73.967099,General,9,0,12,89.5,True,4.4
+H064,City Care Pediatrics Center 64,40.882934,-74.396376,Pediatrics,14,0,10,62.84,True,3.2
+H065,City Care Orthopedics Center 65,41.067127,-73.91824,Orthopedics,13,3,19,89.52,False,3.1
+H066,City Care Pediatrics Center 66,41.055424,-74.412235,Pediatrics,3,18,15,68.6,False,3.0
+H067,City Care Orthopedics Center 67,40.426006,-73.839959,Orthopedics,2,7,8,42.84,False,4.5
+H068,Metro General Hospital 68,41.084564,-74.373861,General,22,40,89,77.12,True,3.7
+H069,City Care Neurology Center 69,40.357922,-74.088152,Neurology,13,7,20,49.03,False,4.4
+H070,City Care Orthopedics Center 70,40.435757,-73.790217,Orthopedics,14,17,18,44.82,True,3.4
+H071,City Care Cardiology Center 71,40.760375,-73.800637,Cardiology,1,9,21,56.73,True,4.3
+H072,City Care Trauma Center 72,40.463703,-73.801364,Trauma,1,4,9,45.31,True,4.7
+H073,Metro General Hospital 73,40.823753,-74.102154,Orthopedics,10,53,52,91.02,True,4.4
+H074,Metro General Hospital 74,40.557728,-73.723295,Orthopedics,38,39,57,85.87,False,4.8
+H075,Metro General Hospital 75,40.412528,-73.732519,Trauma,24,29,39,88.87,True,3.0
+H076,City Care Orthopedics Center 76,40.831745,-73.685663,Orthopedics,12,6,27,82.87,False,3.5
+H077,City Care Neurology Center 77,40.490058,-73.560463,Neurology,8,16,8,74.39,True,3.9
+H078,Metro General Hospital 78,41.11892,-74.283478,Neurology,42,48,69,71.9,False,4.0
+H079,Metro General Hospital 79,41.08857,-74.027964,Cardiology,33,35,55,82.82,True,3.9
+H080,City Care Cardiology Center 80,40.528668,-74.323095,Cardiology,10,10,5,81.18,True,3.9
+H081,City Care Pediatrics Center 81,40.779896,-74.044398,Pediatrics,0,19,7,68.55,False,4.0
+H082,Metro General Hospital 82,41.085983,-73.710333,Neurology,37,58,72,49.7,False,3.4
+H083,Metro General Hospital 83,40.814014,-73.84079,General,35,40,30,96.73,True,3.9
+H084,City Care Orthopedics Center 84,41.019673,-74.412248,Orthopedics,10,4,19,98.93,False,4.9
+H085,City Care Cardiology Center 85,40.854878,-73.912881,Cardiology,6,16,28,80.53,True,3.5
+H086,City Care General Center 86,40.839286,-73.692825,General,14,8,22,68.36,True,3.4
+H087,City Care Orthopedics Center 87,40.340934,-74.287997,Orthopedics,1,9,12,47.9,False,5.0
+H088,City Care General Center 88,40.310024,-74.202812,General,8,2,24,50.14,True,4.9
+H089,Metro General Hospital 89,40.567476,-74.305769,Trauma,37,51,56,56.69,True,4.5
+H090,Metro General Hospital 90,40.305173,-74.037234,Pediatrics,50,44,87,47.84,False,4.2
+H091,City Care Neurology Center 91,40.772798,-73.777657,Neurology,10,9,20,51.23,False,3.3
+H092,Metro General Hospital 92,40.8252,-74.225306,General,44,54,86,53.13,True,3.5
+H093,City Care Trauma Center 93,40.858937,-74.261648,Trauma,12,7,10,98.32,True,3.2
+H094,Metro General Hospital 94,41.154085,-74.377054,Cardiology,36,20,52,47.29,True,4.1
+H095,Metro General Hospital 95,40.651471,-74.236743,General,46,42,67,65.95,True,3.5
+H096,City Care General Center 96,40.331228,-74.040805,General,1,0,29,71.37,True,4.3
+H097,City Care Cardiology Center 97,40.66177,-74.249454,Cardiology,9,4,26,82.67,True,3.8
+H098,City Care Neurology Center 98,40.332391,-73.645961,Neurology,13,15,30,71.23,False,4.3
+H099,Metro General Hospital 99,40.859554,-74.058819,Orthopedics,27,51,56,52.73,True,3.8
+H100,City Care Pediatrics Center 100,40.600096,-73.925411,Pediatrics,0,9,8,71.49,False,4.4
