@@ -33,6 +33,11 @@ class DoctorController {
     return apiResponse(res, 200, true, result.message, result.data);
   });
 
+  predictSeverity = asyncHandler(async (req, res) => {
+    const result = await doctorService.predictSeverity(req.user.id, req.params.id, req.body.vitals);
+    return apiResponse(res, 200, true, result.message, result.data);
+  });
+
 
   getReferrals = asyncHandler(async (req, res) => {
     const result = await doctorService.getReferrals(req.user.id, req.query);

@@ -3,6 +3,7 @@ import app from "./app.js";
 import { env } from "./config/env.js";
 import { logger } from "./utils/logger.js";
 import { connectDB } from "./config/db.js";
+import { aiService } from "./services/ai.service.js";
 
 process.on("uncaughtException", (err) => {
   console.error("[Uncaught Exception]: Shutting down application...");
@@ -17,6 +18,15 @@ const startServer = async () => {
 
     server.listen(env.PORT, () => {
       console.log(`Backend running successfully on port ${env.PORT}`);
+      
+      // Perform AI health check asynchronously
+      aiService.checkAIHealth().then((isHealthy) => {
+        if (isHealthy) {
+          console.log("[AI_STATUS] AI Service is successfully connected and healthy.");
+        } else {
+          console.warn("[AI_STATUS] AI Service health check failed on startup.");
+        }
+      });
     });
 
     process.on("unhandledRejection", (err) => {

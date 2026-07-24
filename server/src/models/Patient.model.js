@@ -66,6 +66,21 @@ const patientSchema = new mongoose.Schema(
       needsOperationTheatre: { type: Boolean, default: false },
       needsGeneralBed: { type: Boolean, default: false },
     },
+    vitals: {
+      heartRate: { type: Number, min: 0, max: 300 },
+      systolicBP: { type: Number, min: 0, max: 300 },
+      diastolicBP: { type: Number, min: 0, max: 200 },
+      spo2: { type: Number, min: 0, max: 100 },
+      respiratoryRate: { type: Number, min: 0, max: 100 },
+      temperature: { type: Number, min: 20.0, max: 45.0 }
+    },
+    aiAssessment: {
+      severity: { type: String, enum: Object.values(REFERRAL_SEVERITY) },
+      confidence: { type: Number },
+      riskScore: { type: Number },
+      recommendation: { type: String },
+      predictionTimestamp: { type: Date }
+    },
     doctorNotes: {
       type: String,
       trim: true,

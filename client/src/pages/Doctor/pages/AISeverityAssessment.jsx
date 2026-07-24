@@ -1,48 +1,72 @@
 import React, { useState } from 'react';
-import { PageHeader } from '@/components/common/PageHeader';
 import { Button } from '@/components/common/Button';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Brain, Activity, ShieldAlert, CheckCircle2 } from 'lucide-react';
+import { Brain, Activity, ShieldAlert } from 'lucide-react';
+import { api } from '@/lib/api';
 
-export default function AISeverityAssessment() {
+export default function AISeverityAssessment({ patient, onAssessmentComplete }) {
   const [analyzing, setAnalyzing] = useState(false);
-  const [result, setResult] = useState(null);
+  const [result, setResult] = useState(patient?.aiAssessment || null);
+  
+  const [vitals, setVitals] = useState({
+    heartRate: patient?.vitals?.heartRate || 80,
+    systolicBP: patient?.vitals?.systolicBP || 120,
+    diastolicBP: patient?.vitals?.diastolicBP || 80,
+    spo2: patient?.vitals?.spo2 || 98,
+    respiratoryRate: patient?.vitals?.respiratoryRate || 16,
+    temperature: patient?.vitals?.temperature || 37.0
+  });
 
-  const runAnalysis = () => {
+  const handleVitalChange = (e) => {
+    setVitals({ ...vitals, [e.target.name]: Number(e.target.value) });
+  };
+
+  const runAnalysis = async () => {
     setAnalyzing(true);
-    setResult(null);
-    setTimeout(() => {
+    try {
+      const res = await api.post(`/v1/patients/${patient._id}/predict-severity`, { vitals });
+      setResult(res.data.data.aiAssessment);
+      if (onAssessmentComplete) onAssessmentComplete(res.data.data);
+    } catch (err) {
+      const errorMessage = err.response?.data?.message || err.message || "Failed to run AI prediction";
+      alert(`Error: ${errorMessage}`);
+    } finally {
       setAnalyzing(false);
-      setResult({ score: 92, status: 'Critical', recommendation: 'Immediate transfer to specialized ICU required.' });
-    }, 2000);
+    }
   };
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto">
-      <PageHeader title="AI Severity Assessment" description="Utilize neural networks to predict patient deterioration risk based on live vitals." />
-
+    <div className="space-y-6 mt-8 border-t pt-8">
       <div className="grid md:grid-cols-2 gap-8">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
           <div className="bg-card border rounded-2xl p-6 shadow-sm">
-            <h3 className="text-lg font-semibold text-card-foreground mb-4">Patient Data Input</h3>
-            <p className="text-sm text-muted-foreground mb-6">Select a patient or verify auto-synced vitals before running inference.</p>
+            <h3 className="text-lg font-semibold text-card-foreground mb-4">AI Severity Assessment</h3>
+            <p className="text-sm text-muted-foreground mb-6">Enter patient vitals to run inference.</p>
             
-            <div className="space-y-4">
-              <div className="p-3 bg-muted/50 rounded-lg border border-border flex justify-between">
-                <span className="text-muted-foreground text-sm">Target Patient</span>
-                <span className="text-card-foreground font-medium text-sm">PT-1094 (Robert Chen)</span>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-xs text-muted-foreground">Heart Rate (bpm)</label>
+                <input type="number" name="heartRate" value={vitals.heartRate} onChange={handleVitalChange} className="w-full mt-1 p-2 bg-muted/50 rounded-lg border border-border text-sm" />
               </div>
-              <div className="p-3 bg-muted/50 rounded-lg border border-border flex justify-between">
-                <span className="text-muted-foreground text-sm">Latest SpO2</span>
-                <span className="text-rose-500 font-medium text-sm">88%</span>
+              <div>
+                <label className="text-xs text-muted-foreground">SpO2 (%)</label>
+                <input type="number" name="spo2" value={vitals.spo2} onChange={handleVitalChange} className="w-full mt-1 p-2 bg-muted/50 rounded-lg border border-border text-sm" />
               </div>
-              <div className="p-3 bg-muted/50 rounded-lg border border-border flex justify-between">
-                <span className="text-muted-foreground text-sm">Latest HR</span>
-                <span className="text-rose-500 font-medium text-sm">142 bpm</span>
+              <div>
+                <label className="text-xs text-muted-foreground">Systolic BP</label>
+                <input type="number" name="systolicBP" value={vitals.systolicBP} onChange={handleVitalChange} className="w-full mt-1 p-2 bg-muted/50 rounded-lg border border-border text-sm" />
               </div>
-              <div className="p-3 bg-muted/50 rounded-lg border border-border flex justify-between">
-                <span className="text-muted-foreground text-sm">ECG Uploaded</span>
-                <span className="text-emerald-600 dark:text-emerald-400 font-medium text-sm flex items-center gap-1"><CheckCircle2 className="w-4 h-4"/> Yes</span>
+              <div>
+                <label className="text-xs text-muted-foreground">Diastolic BP</label>
+                <input type="number" name="diastolicBP" value={vitals.diastolicBP} onChange={handleVitalChange} className="w-full mt-1 p-2 bg-muted/50 rounded-lg border border-border text-sm" />
+              </div>
+              <div>
+                <label className="text-xs text-muted-foreground">Respiratory Rate</label>
+                <input type="number" name="respiratoryRate" value={vitals.respiratoryRate} onChange={handleVitalChange} className="w-full mt-1 p-2 bg-muted/50 rounded-lg border border-border text-sm" />
+              </div>
+              <div>
+                <label className="text-xs text-muted-foreground">Temperature (C)</label>
+                <input type="number" step="0.1" name="temperature" value={vitals.temperature} onChange={handleVitalChange} className="w-full mt-1 p-2 bg-muted/50 rounded-lg border border-border text-sm" />
               </div>
             </div>
 
@@ -77,10 +101,10 @@ export default function AISeverityAssessment() {
               <motion.div key="result" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="w-full bg-card border border-rose-200 dark:border-rose-500/30 rounded-3xl p-8 shadow-sm text-center relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-rose-500/10 rounded-full blur-[40px]"></div>
                 <Activity className="w-12 h-12 text-rose-500 mx-auto mb-4" />
-                <h3 className="text-6xl font-black text-rose-500 mb-2">{result.score}%</h3>
-                <div className="text-rose-500 font-bold tracking-widest uppercase mb-4">{result.status} RISK</div>
+                <h3 className="text-6xl font-black text-rose-500 mb-2">{Math.round(result.confidence * 100)}%</h3>
+                <div className="text-rose-500 font-bold tracking-widest uppercase mb-4">{result.severity} RISK</div>
                 <p className="text-muted-foreground text-sm leading-relaxed mb-6 bg-muted/50 p-4 rounded-lg border border-border">{result.recommendation}</p>
-                <Button className="w-full bg-rose-600 hover:bg-rose-500 text-white">Generate Auto-Referral</Button>
+                <div className="text-xs text-muted-foreground mt-4">Risk Score: {result.riskScore?.toFixed(2)}</div>
               </motion.div>
             )}
           </AnimatePresence>
