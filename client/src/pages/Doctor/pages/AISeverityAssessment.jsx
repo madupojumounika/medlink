@@ -24,7 +24,7 @@ export default function AISeverityAssessment({ patient, onAssessmentComplete }) 
   const runAnalysis = async () => {
     setAnalyzing(true);
     try {
-      const res = await api.post(`/v1/patients/${patient._id}/predict-severity`, { vitals });
+      const res = await api.post(`/v1/doctors/patients/${patient._id}/predict-severity`, { vitals });
       setResult(res.data.data.aiAssessment);
       if (onAssessmentComplete) onAssessmentComplete(res.data.data);
     } catch (err) {

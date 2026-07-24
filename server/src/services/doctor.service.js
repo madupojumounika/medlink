@@ -63,7 +63,11 @@ class DoctorService {
     if (!patient) throw new ApiError(404, "Patient not found");
     
     const doctorProfile = await doctorRepository.getDoctorProfileByUserId(userId);
-    if (patient.createdByDoctorId.toString() !== doctorProfile._id.toString()) {
+    const doctorHospitalId = String(doctorProfile.hospitalId?._id || doctorProfile.hospitalId);
+    const patientHospitalId = String(patient.currentHospitalId?._id || patient.currentHospitalId);
+    const patientDoctorId = String(patient.createdByDoctorId?._id || patient.createdByDoctorId);
+    
+    if (patientDoctorId !== String(doctorProfile._id) && patientHospitalId !== doctorHospitalId) {
       throw new ApiError(403, "Not authorized to access this patient");
     }
 
@@ -75,7 +79,11 @@ class DoctorService {
     if (!patient) throw new ApiError(404, "Patient not found");
     
     const doctorProfile = await doctorRepository.getDoctorProfileByUserId(userId);
-    if (patient.createdByDoctorId.toString() !== doctorProfile._id.toString()) {
+    const doctorHospitalId = String(doctorProfile.hospitalId?._id || doctorProfile.hospitalId);
+    const patientHospitalId = String(patient.currentHospitalId?._id || patient.currentHospitalId);
+    const patientDoctorId = String(patient.createdByDoctorId?._id || patient.createdByDoctorId);
+    
+    if (patientDoctorId !== String(doctorProfile._id) && patientHospitalId !== doctorHospitalId) {
       throw new ApiError(403, "Not authorized to update this patient");
     }
 
@@ -89,8 +97,12 @@ class DoctorService {
     if (!patient) throw new ApiError(404, "Patient not found");
     
     const doctorProfile = await doctorRepository.getDoctorProfileByUserId(userId);
-    if (patient.createdByDoctorId.toString() !== doctorProfile._id.toString()) {
-      throw new ApiError(403, "Not authorized to update this patient");
+    const doctorHospitalId = String(doctorProfile.hospitalId?._id || doctorProfile.hospitalId);
+    const patientHospitalId = String(patient.currentHospitalId?._id || patient.currentHospitalId);
+    const patientDoctorId = String(patient.createdByDoctorId?._id || patient.createdByDoctorId);
+    
+    if (patientDoctorId !== String(doctorProfile._id) && patientHospitalId !== doctorHospitalId) {
+      throw new ApiError(403, "Not authorized to access this patient");
     }
 
     // 2. Call AI Service
