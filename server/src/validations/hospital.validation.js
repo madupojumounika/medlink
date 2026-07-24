@@ -11,12 +11,19 @@ export const profileValidation = [
 ];
 
 export const resourcesValidation = [
-  body("totalBeds").isNumeric().withMessage("Total beds must be a number"),
-  body("availableBeds").isNumeric().withMessage("Available beds must be a number"),
-  body("icuBeds").isNumeric().withMessage("ICU beds must be a number"),
-  body("availableIcuBeds").isNumeric().withMessage("Available ICU beds must be a number"),
-  body("oxygenBeds").isNumeric().withMessage("Oxygen beds must be a number"),
-  body("ventilators").isNumeric().withMessage("Ventilators must be a number"),
+  body("totalICUBeds").optional().isNumeric(),
+  body("availableICUBeds").optional().isNumeric(),
+  body("totalGeneralBeds").optional().isNumeric(),
+  body("availableGeneralBeds").optional().isNumeric(),
+  body("totalEmergencyBeds").optional().isNumeric(),
+  body("availableEmergencyBeds").optional().isNumeric(),
+  body("totalVentilators").optional().isNumeric(),
+  body("availableVentilators").optional().isNumeric(),
+  body("availableDoctors").optional().isNumeric(),
+  body("bloodUnits").optional().isNumeric(),
+  body("nursesCount").optional().isNumeric(),
+  body("operationTheatres").optional().isNumeric(),
+  body("availableAmbulances").optional().isNumeric(),
 ];
 
 export const referralActionValidation = [

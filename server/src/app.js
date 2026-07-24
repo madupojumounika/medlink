@@ -18,6 +18,8 @@ import ambulanceRoutes from "./routes/ambulance.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import patientRoutes from "./routes/patient.routes.js";
 import hospitalResourceRoutes from "./routes/hospitalResource.routes.js";
+import departmentRoutes from "./routes/department.routes.js";
+import referralRoutes from "./routes/referral.routes.js";
 
 const app = express();
 
@@ -57,6 +59,8 @@ app.use("/api/v1/ambulances", ambulanceRoutes);
 app.use("/api/v1/admin", adminRoutes);
 app.use("/api/v1/patients", patientRoutes);
 app.use("/api/v1/hospital-resources", hospitalResourceRoutes);
+app.use("/api/v1/departments", departmentRoutes);
+app.use("/api/v1/referrals", referralRoutes);
 
 app.use(notFound);
 

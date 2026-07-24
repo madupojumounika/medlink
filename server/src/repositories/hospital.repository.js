@@ -2,18 +2,21 @@ import Hospital from "../models/Hospital.model.js";
 import HospitalResource from "../models/HospitalResource.model.js";
 import Referral from "../models/Referral.model.js";
 import DoctorProfile from "../models/DoctorProfile.model.js";
+import AdminProfile from "../models/AdminProfile.model.js";
+import CoordinatorProfile from "../models/CoordinatorProfile.model.js";
+import User from "../models/User.model.js";
 
 class HospitalRepository {
   async getHospitalByUserId(userId) {
     return await Hospital.findOne({ userId, isActive: true }).lean();
   }
 
-  async getHospitalProfile(userId) {
-    return await Hospital.findOne({ userId, isActive: true }).lean();
+  async getHospitalProfile(hospitalId) {
+    return await Hospital.findOne({ _id: hospitalId, isActive: true }).lean();
   }
 
-  async updateHospitalProfile(userId, profileData) {
-    return await Hospital.findOneAndUpdate({ userId, isActive: true }, profileData, { new: true, runValidators: true });
+  async updateHospitalProfile(hospitalId, profileData) {
+    return await Hospital.findOneAndUpdate({ _id: hospitalId, isActive: true }, profileData, { new: true, runValidators: true });
   }
 
   async getResources(hospitalId) {
@@ -64,15 +67,47 @@ class HospitalRepository {
     return await Referral.findOneAndUpdate({ _id: referralId, isActive: true }, updateData, { new: true, runValidators: true });
   }
 
-  async getDoctors(query, options) {
+  async getEmployees(query, options) {
     const { sort, skip, limit } = options;
-    const data = await DoctorProfile.find({ ...query, isActive: true })
+    const data = await User.find({ ...query, isActive: true })
+      .select("-password")
       .sort(sort)
       .skip(skip)
       .limit(limit)
       .lean();
-    const total = await DoctorProfile.countDocuments({ ...query, isActive: true });
+    const total = await User.countDocuments({ ...query, isActive: true });
     return { data, total };
+  }
+
+  async updateEmployeeStatus(employeeId, isActive) {
+    return await User.findByIdAndUpdate(
+      employeeId,
+      { isActive },
+      { new: true, runValidators: true }
+    );
+  }
+
+  async updateEmployeeProfile(employeeId, role, details) {
+    let Model;
+    switch (role) {
+      case "doctor":
+        Model = DoctorProfile;
+        break;
+      case "referral_coordinator":
+        Model = CoordinatorProfile;
+        break;
+      case "hospital_admin":
+        Model = AdminProfile;
+        break;
+      default:
+        throw new Error("Invalid employee role for profile update");
+    }
+
+    return await Model.findOneAndUpdate(
+      { userId: employeeId },
+      details,
+      { new: true, runValidators: true }
+    );
   }
 
   async createHospital(hospitalData) {

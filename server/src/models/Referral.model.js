@@ -48,9 +48,24 @@ const referralSchema = new mongoose.Schema(
       default: REFERRAL_STATUS.PENDING,
       index: true,
     },
+    statusHistory: [
+      {
+        status: { type: String, enum: Object.values(REFERRAL_STATUS) },
+        updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+        updatedAt: { type: Date, default: Date.now },
+        remarks: { type: String, trim: true },
+      },
+    ],
     notes: {
       type: String,
       trim: true,
+    },
+    coordinatorId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+    sentAt: {
+      type: Date,
     },
     acceptedAt: {
       type: Date,

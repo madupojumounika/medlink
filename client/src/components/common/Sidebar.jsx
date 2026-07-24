@@ -1,6 +1,6 @@
 import * as React from "react"
 import { Link, useLocation } from "react-router-dom"
-import { Activity, LayoutDashboard, Users, Calendar, Settings, LogOut, FileText, UserSquare, Bed, Database, HeartPulse, Stethoscope, AlertTriangle, Map, MapPin, Building, Truck, ShieldCheck } from "lucide-react"
+import { Activity, LayoutDashboard, Users, Calendar, Settings, LogOut, FileText, UserSquare, Bed, Database, HeartPulse, Stethoscope, AlertTriangle, Map, MapPin, Building, Truck, ShieldCheck, UserPlus, Bell, User } from "lucide-react"
 import { cn } from "@/utils/cn"
 import { useAuth } from "@/hooks/useAuth"
 
@@ -9,8 +9,9 @@ const hospitalNavigation = [
   { name: 'Hospital Profile', href: '/dashboard/hospital/profile', icon: UserSquare },
   { name: 'ICU & Beds', href: '/dashboard/hospital/icu', icon: Bed },
   { name: 'Resources', href: '/dashboard/hospital/resources', icon: Database },
-  { name: 'Doctors', href: '/dashboard/hospital/doctors', icon: Stethoscope },
-  { name: 'Referrals', href: '/dashboard/hospital/referrals', icon: FileText },
+  { name: 'Staff Management', href: '/dashboard/hospital/doctors', icon: Stethoscope },
+  { name: 'Departments', href: '/dashboard/hospital/departments', icon: Building },
+  { name: 'Incoming Requests', href: '/dashboard/hospital/referrals', icon: FileText },
   { name: 'Emergency Queue', href: '/dashboard/hospital/patients', icon: AlertTriangle },
   { name: 'Analytics', href: '/dashboard/analytics', icon: Activity },
   { name: 'Settings', href: '/dashboard/hospital/settings', icon: Settings },
@@ -18,12 +19,11 @@ const hospitalNavigation = [
 
 const doctorNavigation = [
   { name: 'Dashboard', href: '/dashboard/doctor', icon: LayoutDashboard },
-  { name: 'Register Patient', href: '/dashboard/doctor/patients/new', icon: Users },
-  { name: 'AI Severity', href: '/dashboard/doctor/severity', icon: Activity },
-  { name: 'New Referral', href: '/dashboard/doctor/referrals/new', icon: HeartPulse },
-  { name: 'Referral History', href: '/dashboard/doctor/referrals', icon: FileText },
-  { name: 'Notifications', href: '/dashboard/notifications', icon: Bed },
-  { name: 'Profile', href: '/dashboard/profile', icon: UserSquare },
+  { name: 'Patients', href: '/dashboard/doctor/patients', icon: Users },
+  { name: 'Add Patient', href: '/dashboard/doctor/add-patient', icon: UserPlus },
+  { name: 'History', href: '/dashboard/doctor/history', icon: FileText },
+  { name: 'Notifications', href: '/dashboard/doctor/notifications', icon: Bell },
+  { name: 'Profile', href: '/dashboard/doctor/profile', icon: User },
   { name: 'Settings', href: '/dashboard/settings', icon: Settings },
 ]
 
@@ -51,21 +51,29 @@ const adminNavigation = [
   { name: 'Settings', href: '/dashboard/settings', icon: Settings },
 ]
 
+const coordinatorNavigation = [
+  { name: 'Dashboard', href: '/dashboard/coordinator', icon: LayoutDashboard },
+  { name: 'Internal Queue', href: '/dashboard/coordinator/queue', icon: Activity },
+  { name: 'Referral History', href: '/dashboard/coordinator/history', icon: FileText },
+  { name: 'Settings', href: '/dashboard/settings', icon: Settings },
+];
+
 export function Sidebar() {
   const location = useLocation()
   const { user, logout } = useAuth()
 
-  // Determine which navigation to show based on user role
   const getNavigation = () => {
     switch (user?.role) {
-      case 'hospital':
+      case 'hospital_admin':
         return hospitalNavigation;
       case 'doctor':
         return doctorNavigation;
       case 'ambulance':
         return ambulanceNavigation;
-      case 'admin':
+      case 'system_admin':
         return adminNavigation;
+      case 'referral_coordinator':
+        return coordinatorNavigation;
       default:
         return [];
     }

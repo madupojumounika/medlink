@@ -44,6 +44,7 @@ const NotificationsCenter = lazy(() => import('@/pages/Shared/NotificationsCente
 const NotFound = lazy(() => import('@/pages/Shared/NotFound.jsx'));
 const ServerError = lazy(() => import('@/pages/Shared/ServerError.jsx'));
 const Maintenance = lazy(() => import('@/pages/Shared/Maintenance.jsx'));
+const CoordinatorRoutes = lazy(() => import('@/pages/Coordinator/CoordinatorRoutes.jsx'));
 
 export function AppRoutes() {
   const location = useLocation();
@@ -79,15 +80,15 @@ export function AppRoutes() {
 
             <Route path="/dashboard" element={<ProtectedRoute><PageTransition><DashboardLayout /></PageTransition></ProtectedRoute>}>
               <Route index element={<Dashboard />} />
-              
-              <Route path="hospital/*" element={<RoleRoute allowedRoles={['hospital']}><HospitalRoutes /></RoleRoute>} />
+              <Route path="hospital/*" element={<RoleRoute allowedRoles={['hospital_admin']}><HospitalRoutes /></RoleRoute>} />
               <Route path="doctor/*" element={<RoleRoute allowedRoles={['doctor']}><DoctorRoutes /></RoleRoute>} />
+              <Route path="coordinator/*" element={<RoleRoute allowedRoles={['referral_coordinator']}><CoordinatorRoutes /></RoleRoute>} />
               <Route path="ambulance/*" element={<RoleRoute allowedRoles={['ambulance']}><AmbulanceRoutes /></RoleRoute>} />
-              <Route path="admin/*" element={<RoleRoute allowedRoles={['admin']}><AdminRoutes /></RoleRoute>} />
+              <Route path="admin/*" element={<RoleRoute allowedRoles={['system_admin']}><AdminRoutes /></RoleRoute>} />
               
               {/* Other modules available to specific roles or multiple roles if needed */}
               <Route path="patient" element={<Patient />} />
-              <Route path="analytics/*" element={<RoleRoute allowedRoles={['admin', 'hospital']}><AnalyticsRoutes /></RoleRoute>} />
+              <Route path="analytics/*" element={<RoleRoute allowedRoles={['system_admin', 'hospital_admin']}><AnalyticsRoutes /></RoleRoute>} />
               
               <Route path="settings" element={<AccountSettings />} />
               <Route path="profile" element={<UserProfile />} />

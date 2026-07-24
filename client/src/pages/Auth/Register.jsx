@@ -12,30 +12,6 @@ import { useAuth } from '@/hooks/useAuth';
 
 const getRoleConfig = (role) => {
   switch (role) {
-    case 'doctor':
-      return {
-        title: 'Doctor Registration',
-        schema: {
-          fullName: z.string().min(2, 'Full name is required'),
-          email: z.string().email('Valid email is required'),
-          password: z.string().min(8, 'Minimum 8 characters'),
-          confirmPassword: z.string(),
-          phone: z.string().min(10, 'Valid phone number is required'),
-          licenseNumber: z.string().min(4, 'License number is required'),
-          specialization: z.string().min(2, 'Specialization is required'),
-          hospitalName: z.string().min(2, 'Hospital name is required'),
-          experience: z.string().min(1, 'Years of experience is required')
-        },
-        fields: [
-          { name: 'fullName', label: 'Full Name', icon: User, type: 'text', placeholder: 'Dr. Jane Doe' },
-          { name: 'email', label: 'Email', icon: Mail, type: 'email', placeholder: 'jane.doe@example.com' },
-          { name: 'phone', label: 'Phone Number', icon: Phone, type: 'tel', placeholder: '+1 234 567 8900' },
-          { name: 'licenseNumber', label: 'Medical License Number', icon: Hash, type: 'text', placeholder: 'MD-1234567' },
-          { name: 'specialization', label: 'Specialization', icon: Briefcase, type: 'text', placeholder: 'Cardiology' },
-          { name: 'hospitalName', label: 'Hospital Name', icon: Building, type: 'text', placeholder: 'General Medical Center' },
-          { name: 'experience', label: 'Years of Experience', icon: Hash, type: 'number', placeholder: '5' }
-        ]
-      };
     case 'hospital':
       return {
         title: 'Hospital Registration',
@@ -84,28 +60,6 @@ const getRoleConfig = (role) => {
           { name: 'registrationNumber', label: 'Ambulance Registration', icon: Truck, type: 'text', placeholder: 'AMB-456' },
           { name: 'organization', label: 'Organization / Hospital', icon: Building, type: 'text', placeholder: 'City EMS Services' },
           { name: 'experience', label: 'Years of Experience', icon: Hash, type: 'number', placeholder: '3' }
-        ]
-      };
-    case 'admin':
-      return {
-        title: 'System Admin Registration',
-        schema: {
-          fullName: z.string().min(2, 'Full name is required'),
-          email: z.string().email('Valid email is required'),
-          password: z.string().min(8, 'Minimum 8 characters'),
-          confirmPassword: z.string(),
-          phone: z.string().min(10, 'Valid phone number is required'),
-          organization: z.string().min(2, 'Organization is required'),
-          employeeId: z.string().min(2, 'Employee ID is required'),
-          adminCode: z.string().min(6, 'Admin code is required')
-        },
-        fields: [
-          { name: 'fullName', label: 'Full Name', icon: User, type: 'text', placeholder: 'Sarah Connor' },
-          { name: 'email', label: 'Email', icon: Mail, type: 'email', placeholder: 'sarah.c@medlink.ai' },
-          { name: 'phone', label: 'Phone Number', icon: Phone, type: 'tel', placeholder: '+1 234 567 8900' },
-          { name: 'organization', label: 'Organization', icon: Building, type: 'text', placeholder: 'MedLink Systems' },
-          { name: 'employeeId', label: 'Employee ID', icon: Hash, type: 'text', placeholder: 'EMP-10293' },
-          { name: 'adminCode', label: 'Admin Access Code', icon: ShieldCheck, type: 'text', placeholder: 'Enter provided code' }
         ]
       };
     default:

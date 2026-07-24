@@ -12,16 +12,34 @@ const doctorProfileSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Hospital",
     },
-    specialization: {
+    departmentId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Department",
+    },
+    shift: {
       type: String,
-      required: true,
       trim: true,
     },
-    registrationNumber: {
+    photoUrl: {
+      type: String,
+      trim: true,
+    },
+    qualifications: {
+      type: [String],
+    },
+    licenseNumber: {
       type: String,
       required: true,
       unique: true,
       trim: true,
+    },
+    opTimings: {
+      type: String,
+      trim: true,
+    },
+    availability: {
+      type: Boolean,
+      default: true,
     },
     phone: {
       type: String,

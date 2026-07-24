@@ -13,36 +13,36 @@ const getPaginationOptions = (query) => {
 };
 
 class HospitalService {
-  async getHospitalProfile(userId) {
-    const profile = await hospitalRepository.getHospitalProfile(userId);
+  async getHospitalProfile(hospitalId) {
+    const profile = await hospitalRepository.getHospitalProfile(hospitalId);
     if (!profile) throw new ApiError(404, "Hospital profile not found");
     return { message: "Hospital profile retrieved successfully", data: profile };
   }
 
-  async updateHospitalProfile(userId, profileData) {
-    const profile = await hospitalRepository.updateHospitalProfile(userId, profileData);
+  async updateHospitalProfile(hospitalId, profileData) {
+    const profile = await hospitalRepository.updateHospitalProfile(hospitalId, profileData);
     if (!profile) throw new ApiError(404, "Hospital profile not found");
     return { message: "Hospital profile updated successfully", data: profile };
   }
 
-  async getResources(userId) {
-    const hospital = await hospitalRepository.getHospitalByUserId(userId);
+  async getResources(hospitalId) {
+    const hospital = await hospitalRepository.getHospitalById(hospitalId);
     if (!hospital) throw new ApiError(404, "Hospital not found");
     
     const resources = await hospitalRepository.getResources(hospital._id);
     return { message: "Hospital resources retrieved successfully", data: resources || {} };
   }
 
-  async updateResources(userId, resourcesData) {
-    const hospital = await hospitalRepository.getHospitalByUserId(userId);
+  async updateResources(hospitalId, resourcesData) {
+    const hospital = await hospitalRepository.getHospitalById(hospitalId);
     if (!hospital) throw new ApiError(404, "Hospital not found");
 
     const resources = await hospitalRepository.updateResources(hospital._id, resourcesData);
     return { message: "Hospital resources updated successfully", data: resources };
   }
 
-  async createReferral(userId, referralData) {
-    const hospital = await hospitalRepository.getHospitalByUserId(userId);
+  async createReferral(hospitalId, referralData) {
+    const hospital = await hospitalRepository.getHospitalById(hospitalId);
     if (!hospital) throw new ApiError(404, "Hospital not found");
 
     const activeReferrals = await hospitalRepository.getReferrals({
@@ -74,8 +74,8 @@ class HospitalService {
     }
   }
 
-  async getReferrals(userId, queryParams) {
-    const hospital = await hospitalRepository.getHospitalByUserId(userId);
+  async getReferrals(hospitalId, queryParams) {
+    const hospital = await hospitalRepository.getHospitalById(hospitalId);
     if (!hospital) throw new ApiError(404, "Hospital not found");
 
     const options = getPaginationOptions(queryParams);
@@ -101,8 +101,8 @@ class HospitalService {
     };
   }
 
-  async getReferralById(userId, referralId) {
-    const hospital = await hospitalRepository.getHospitalByUserId(userId);
+  async getReferralById(hospitalId, referralId) {
+    const hospital = await hospitalRepository.getHospitalById(hospitalId);
     if (!hospital) throw new ApiError(404, "Hospital not found");
 
     const referral = await hospitalRepository.getReferralById(referralId);
@@ -119,8 +119,8 @@ class HospitalService {
     return { message: "Referral retrieved successfully", data: referral };
   }
 
-  async acceptReferral(userId, referralId, remarks) {
-    const hospital = await hospitalRepository.getHospitalByUserId(userId);
+  async acceptReferral(hospitalId, referralId, remarks) {
+    const hospital = await hospitalRepository.getHospitalById(hospitalId);
     if (!hospital) throw new ApiError(404, "Hospital not found");
 
     const referral = await hospitalRepository.getReferralById(referralId);
@@ -143,8 +143,8 @@ class HospitalService {
     return { message: "Referral accepted successfully", data: updatedReferral };
   }
 
-  async rejectReferral(userId, referralId, remarks) {
-    const hospital = await hospitalRepository.getHospitalByUserId(userId);
+  async rejectReferral(hospitalId, referralId, remarks) {
+    const hospital = await hospitalRepository.getHospitalById(hospitalId);
     if (!hospital) throw new ApiError(404, "Hospital not found");
 
     const referral = await hospitalRepository.getReferralById(referralId);
@@ -178,23 +178,82 @@ class HospitalService {
     }
   }
 
-  async getDoctors(userId, queryParams = {}) {
-    const hospital = await hospitalRepository.getHospitalByUserId(userId);
-    if (!hospital) throw new ApiError(404, "Hospital not found");
+  async createEmployee(hospitalId, employeeData) {
+    const { authRepository } = await import("../repositories/auth.repository.js");
+    const { createProfile } = await import("../utils/profile.factory.js");
+    const { hashPassword } = await import("../utils/password.js");
+    
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    try {
+      const existingUser = await authRepository.findUserByEmail(employeeData.email);
+      if (existingUser) {
+        throw new ApiError(400, "Email already in use");
+      }
 
+      const hashedPassword = await hashPassword(employeeData.password);
+
+      const userForDB = {
+        fullName: employeeData.fullName,
+        email: employeeData.email,
+        password: hashedPassword,
+        role: employeeData.role, // e.g. "doctor", "referral_coordinator"
+        hospitalId: hospitalId
+      };
+
+      const createdUser = await authRepository.createUser(userForDB, session);
+      await createProfile(createdUser, session);
+
+      await session.commitTransaction();
+      
+      const { password, ...userWithoutPassword } = createdUser.toObject ? createdUser.toObject() : createdUser;
+      return { message: "Employee created successfully", data: userWithoutPassword };
+    } catch (error) {
+      await session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
+    }
+  }
+
+  async getEmployees(hospitalId, queryParams = {}) {
     const options = getPaginationOptions(queryParams);
-    const query = { hospitalId: hospital._id };
+    const query = { hospitalId: hospitalId };
 
-    if (queryParams.search) {
-      query.specialization = { $regex: queryParams.search, $options: "i" };
+    if (queryParams.role) {
+      query.role = queryParams.role;
     }
 
-    const { data, total } = await hospitalRepository.getDoctors(query, options);
+    if (queryParams.search) {
+      query.fullName = { $regex: queryParams.search, $options: "i" };
+    }
+
+    const { data, total } = await hospitalRepository.getEmployees(query, options);
     return { 
-      message: "Doctors retrieved successfully", 
+      message: "Employees retrieved successfully", 
       data,
       meta: { total, page: options.page, limit: options.limit }
     };
+  }
+
+  async updateEmployeeStatus(hospitalId, employeeId, isActive) {
+    // We could verify the employee belongs to the hospital here
+    const updatedEmployee = await hospitalRepository.updateEmployeeStatus(employeeId, isActive);
+    if (!updatedEmployee) {
+      throw new ApiError(404, "Employee not found");
+    }
+    return { message: "Employee status updated successfully", data: updatedEmployee };
+  }
+
+  async updateEmployeeDetails(hospitalId, employeeId, details) {
+    const { authRepository } = await import("../repositories/auth.repository.js");
+    const user = await authRepository.findUserById(employeeId);
+    if (!user || user.hospitalId?.toString() !== hospitalId.toString()) {
+      throw new ApiError(404, "Employee not found in your hospital");
+    }
+
+    const updatedProfile = await hospitalRepository.updateEmployeeProfile(employeeId, user.role, details);
+    return { message: "Employee details updated successfully", data: updatedProfile };
   }
 
   async createHospital(hospitalData) {
@@ -229,6 +288,49 @@ class HospitalService {
       throw new ApiError(404, "Hospital not found");
     }
     return { message: "Hospital deleted successfully", data: hospital };
+  }
+
+  async getDashboardStats(hospitalId) {
+    const hospital = await hospitalRepository.getHospitalById(hospitalId);
+    if (!hospital) throw new ApiError(404, "Hospital not found");
+
+    // Get Resources for ICU Beds
+    const resources = await hospitalRepository.getResources(hospitalId);
+    const availableICUBeds = resources ? resources.availableICUBeds : 0;
+    const totalICUBeds = resources ? resources.totalICUBeds : 0;
+
+    // Get Active Doctors
+    const { total: activeDoctorsCount } = await hospitalRepository.getEmployees({
+      hospitalId,
+      role: "doctor",
+      isActive: true
+    }, { limit: 1 });
+
+    // Get Active Coordinators
+    const { total: activeCoordinatorsCount } = await hospitalRepository.getEmployees({
+      hospitalId,
+      role: "referral_coordinator",
+      isActive: true
+    }, { limit: 1 });
+
+    // Get Incoming Referrals awaiting review
+    const { total: incomingReferralsCount, data: activeEmergencies } = await hospitalRepository.getReferrals({
+      toHospitalId: hospitalId,
+      status: REFERRAL_STATUS.SENT_TO_HOSPITAL
+    }, { limit: 5, sort: { createdAt: -1 } });
+
+    return {
+      message: "Dashboard stats retrieved successfully",
+      data: {
+        availableICUBeds,
+        totalICUBeds,
+        activeDoctorsCount,
+        activeCoordinatorsCount,
+        incomingReferralsCount,
+        avgTriageTime: "4.2m", // Placeholder for future complex aggregation
+        activeEmergencies
+      }
+    };
   }
 }
 

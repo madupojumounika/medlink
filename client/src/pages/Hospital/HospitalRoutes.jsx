@@ -10,6 +10,7 @@ const ResourceManagement = lazy(() => import('./pages/ResourceManagement.jsx'));
 const DoctorManagement = lazy(() => import('./pages/DoctorManagement.jsx'));
 const Referrals = lazy(() => import('./pages/Referrals.jsx'));
 const EmergencyQueue = lazy(() => import('./pages/EmergencyQueue.jsx'));
+const DepartmentManagement = lazy(() => import('./pages/DepartmentManagement.jsx'));
 const HospitalSettings = lazy(() => import('./pages/HospitalSettings.jsx'));
 
 export default function HospitalRoutes() {
@@ -21,6 +22,7 @@ export default function HospitalRoutes() {
         <Route path="icu" element={<PageTransition><ICUAvailability /></PageTransition>} />
         <Route path="resources" element={<PageTransition><ResourceManagement /></PageTransition>} />
         <Route path="doctors" element={<PageTransition><DoctorManagement /></PageTransition>} />
+        <Route path="departments" element={<PageTransition><DepartmentManagement /></PageTransition>} />
         <Route path="referrals" element={<PageTransition><Referrals /></PageTransition>} />
         <Route path="patients" element={<PageTransition><EmergencyQueue /></PageTransition>} />
         <Route path="settings" element={<PageTransition><HospitalSettings /></PageTransition>} />

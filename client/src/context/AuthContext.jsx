@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect } from 'react';
 import { authService } from '@/services/authService';
+import { storageService } from '@/services/storageService';
 
 export const AuthContext = createContext(null);
 
@@ -8,12 +9,26 @@ export const AuthProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is logged in on mount
-    const currentUser = authService.getCurrentUser();
-    if (currentUser) {
-      setUser(currentUser);
-    }
-    setIsLoading(false);
+    const hydrateAuth = async () => {
+      try {
+        const session = authService.getCurrentUser();
+        if (session && session.token) {
+          const profile = await authService.getProfile();
+          const updatedSession = { ...profile, token: session.token };
+          authService.setSession?.(updatedSession) || storageService.setSession(updatedSession);
+          setUser(updatedSession);
+        } else {
+          setUser(null);
+        }
+      } catch (error) {
+        console.warn("Session expired or invalid token");
+        authService.logout();
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    hydrateAuth();
   }, []);
 
   const login = async (email, password) => {

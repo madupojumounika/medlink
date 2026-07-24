@@ -58,6 +58,21 @@ const hospitalResourceSchema = new mongoose.Schema(
       default: 0,
       min: 0,
     },
+    nursesCount: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    operationTheatres: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    availableAmbulances: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
   },
   {
     timestamps: true,

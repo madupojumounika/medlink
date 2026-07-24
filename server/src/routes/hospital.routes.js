@@ -13,15 +13,24 @@ import { authorize } from "../middleware/authorize.js";
 const router = Router();
 
 // Protect all hospital routes
-router.use(authenticate, authorize("hospital"));
+router.use(authenticate, authorize("hospital_admin"));
 
 // Profile
 router.get("/profile", hospitalController.getProfile);
 router.put("/profile", profileValidation, validate, hospitalController.updateProfile);
 
+// Stats
+router.get("/stats", hospitalController.getStats);
+
 // Resources
 router.get("/resources", hospitalController.getResources);
 router.put("/resources", resourcesValidation, validate, hospitalController.updateResources);
+
+// Employees (Staff)
+router.post("/employees", hospitalController.createEmployee);
+router.get("/employees", hospitalController.getEmployees);
+router.patch("/employees/:id/status", hospitalController.updateEmployeeStatus);
+router.put("/employees/:id/details", hospitalController.updateEmployeeDetails);
 
 // Referrals
 router.post("/referrals", referralCreationValidation, validate, hospitalController.createReferral);
@@ -40,9 +49,6 @@ router.put(
   validate,
   hospitalController.rejectReferral
 );
-
-// Doctors
-router.get("/doctors", hospitalController.getDoctors);
 
 // Generic CRUD
 router.post("/", hospitalController.createHospital);

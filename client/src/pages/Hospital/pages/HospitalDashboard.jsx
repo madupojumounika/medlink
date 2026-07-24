@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { PageHeader } from '@/components/common/PageHeader';
 import { MetricCard } from '@/components/common/MetricCard';
 import { DataTable } from '@/components/common/DataTable';
@@ -7,12 +7,8 @@ import { ChartCard } from '@/components/common/ChartCard';
 import { Activity, Bed, Users, AlertTriangle } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { motion } from 'framer-motion';
-
-const activeEmergencies = [
-  { id: 'EM-1029', type: 'Trauma', severity: 'Critical', eta: '5 mins', unit: 'Alpha-1' },
-  { id: 'EM-1030', type: 'Cardiac', severity: 'High', eta: '12 mins', unit: 'Bravo-4' },
-  { id: 'EM-1031', type: 'Neurological', severity: 'Medium', eta: '18 mins', unit: 'Charlie-2' },
-];
+import { api } from '@/lib/api';
+import { Loader } from '@/components/common/Loader';
 
 const chartData = [
   { time: '00:00', patients: 12 }, { time: '04:00', patients: 8 },
@@ -22,23 +18,42 @@ const chartData = [
 ];
 
 export default function HospitalDashboard() {
+  const [stats, setStats] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
+  const fetchStats = async () => {
+    try {
+      const res = await api.get('/v1/hospitals/stats');
+      setStats(res.data.data);
+    } catch (error) {
+      console.error('Failed to load dashboard stats', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const columns = [
-    { header: 'ID', accessorKey: 'id' },
-    { header: 'Type', accessorKey: 'type' },
-    { header: 'Severity', accessorKey: 'severity', cell: (row) => <StatusBadge status={row.severity === 'Critical' ? 'critical' : row.severity === 'High' ? 'pending' : 'stable'}>{row.severity}</StatusBadge> },
-    { header: 'ETA', accessorKey: 'eta' },
-    { header: 'Unit', accessorKey: 'unit' },
+    { header: 'ID', accessorKey: '_id', cell: (row) => row._id?.slice(-6).toUpperCase() },
+    { header: 'Patient', cell: (row) => row.patientId?.name || 'Unknown' },
+    { header: 'Severity', accessorKey: 'priority', cell: (row) => <StatusBadge status={row.priority === 'Critical' ? 'critical' : row.priority === 'High' ? 'pending' : 'stable'}>{row.priority}</StatusBadge> },
+    { header: 'From', cell: (row) => row.fromHospitalId?.name || 'Unknown' },
   ];
+
+  if (isLoading) return <div className="flex justify-center p-12"><Loader size="lg" /></div>;
 
   return (
     <div className="space-y-6">
       <PageHeader title="Hospital Command Center" description="Real-time overview of hospital capacity and incoming emergencies." />
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <MetricCard title="Available ICU Beds" value="12" description="Out of 45 total" icon={Bed} trend={{ isPositive: false, value: 5 }} />
-        <MetricCard title="Incoming Referrals" value="8" description="Expected in next hour" icon={AlertTriangle} trend={{ isPositive: true, value: 12 }} />
-        <MetricCard title="Active Doctors" value="34" description="Currently on shift" icon={Users} trend={{ isPositive: true, value: 2 }} />
-        <MetricCard title="Avg Triage Time" value="4.2m" description="Past 24 hours" icon={Activity} trend={{ isPositive: true, value: 8 }} />
+        <MetricCard title="Available ICU Beds" value={stats?.availableICUBeds || 0} description={`Out of ${stats?.totalICUBeds || 0} total`} icon={Bed} trend={{ isPositive: true, value: 0 }} />
+        <MetricCard title="Incoming Referrals" value={stats?.incomingReferralsCount || 0} description="Awaiting review" icon={AlertTriangle} trend={{ isPositive: true, value: 0 }} />
+        <MetricCard title="Active Doctors" value={stats?.activeDoctorsCount || 0} description="Currently on shift" icon={Users} trend={{ isPositive: true, value: 0 }} />
+        <MetricCard title="Avg Triage Time" value={stats?.avgTriageTime || "N/A"} description="Past 24 hours" icon={Activity} trend={{ isPositive: true, value: 0 }} />
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
@@ -66,7 +81,11 @@ export default function HospitalDashboard() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="lg:col-span-1 flex flex-col gap-6">
           <div className="bg-slate-900/50 backdrop-blur-sm border border-white/5 rounded-2xl p-6 flex-1">
             <h3 className="text-lg font-semibold text-white mb-4">Incoming Emergencies</h3>
-            <DataTable columns={columns} data={activeEmergencies} searchable={false} />
+            {stats?.activeEmergencies?.length > 0 ? (
+              <DataTable columns={columns} data={stats.activeEmergencies} searchable={false} />
+            ) : (
+              <div className="text-center text-slate-400 py-8">No incoming emergencies.</div>
+            )}
           </div>
         </motion.div>
       </div>

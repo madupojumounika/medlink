@@ -2,11 +2,22 @@ import mongoose from "mongoose";
 
 const hospitalSchema = new mongoose.Schema(
   {
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-      index: true,
+    logo: {
+      type: String,
+      trim: true,
+    },
+    licenseDetails: {
+      type: String,
+      trim: true,
+    },
+    workingHours: {
+      type: String,
+      trim: true,
+      default: "24/7",
+    },
+    emergencyContact: {
+      type: String,
+      trim: true,
     },
     hospitalName: {
       type: String,

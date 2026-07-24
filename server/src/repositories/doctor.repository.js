@@ -4,7 +4,10 @@ import Referral from "../models/Referral.model.js";
 
 export class DoctorRepository {
   async getDoctorProfileByUserId(userId) {
-    return await DoctorProfile.findOne({ userId, isActive: true }).populate("hospitalId", "name email phone").lean();
+    return await DoctorProfile.findOne({ userId, isActive: true })
+      .populate("userId", "fullName email role")
+      .populate("hospitalId", "hospitalName email phone")
+      .lean();
   }
 
   async updateDoctorProfile(userId, updateData) {

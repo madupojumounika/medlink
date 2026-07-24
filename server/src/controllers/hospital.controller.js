@@ -4,53 +4,68 @@ import { hospitalService } from "../services/hospital.service.js";
 
 class HospitalController {
   getProfile = asyncHandler(async (req, res) => {
-    const result = await hospitalService.getHospitalProfile(req.user.id);
+    const result = await hospitalService.getHospitalProfile(req.user.hospitalId);
     return apiResponse(res, 200, true, result.message, result.data);
   });
 
   updateProfile = asyncHandler(async (req, res) => {
-    const result = await hospitalService.updateHospitalProfile(req.user.id, req.body);
+    const result = await hospitalService.updateHospitalProfile(req.user.hospitalId, req.body);
     return apiResponse(res, 200, true, result.message, result.data);
   });
 
   getResources = asyncHandler(async (req, res) => {
-    const result = await hospitalService.getResources(req.user.id);
+    const result = await hospitalService.getResources(req.user.hospitalId);
     return apiResponse(res, 200, true, result.message, result.data);
   });
 
   updateResources = asyncHandler(async (req, res) => {
-    const result = await hospitalService.updateResources(req.user.id, req.body);
+    const result = await hospitalService.updateResources(req.user.hospitalId, req.body);
     return apiResponse(res, 200, true, result.message, result.data);
   });
+  
   createReferral = asyncHandler(async (req, res) => {
-    const result = await hospitalService.createReferral(req.user.id, req.body);
+    const result = await hospitalService.createReferral(req.user.hospitalId, req.body);
     return apiResponse(res, 201, true, result.message, result.data);
   });
 
-
   getReferrals = asyncHandler(async (req, res) => {
-    const result = await hospitalService.getReferrals(req.user.id, req.query);
+    const result = await hospitalService.getReferrals(req.user.hospitalId, req.query);
     return apiResponse(res, 200, true, result.message, result.data, null, result.meta);
   });
 
   getReferralById = asyncHandler(async (req, res) => {
-    const result = await hospitalService.getReferralById(req.user.id, req.params.id);
+    const result = await hospitalService.getReferralById(req.user.hospitalId, req.params.id);
     return apiResponse(res, 200, true, result.message, result.data);
   });
 
   acceptReferral = asyncHandler(async (req, res) => {
-    const result = await hospitalService.acceptReferral(req.user.id, req.params.id, req.body.remarks);
+    const result = await hospitalService.acceptReferral(req.user.hospitalId, req.params.id, req.body.remarks);
     return apiResponse(res, 200, true, result.message, result.data);
   });
 
   rejectReferral = asyncHandler(async (req, res) => {
-    const result = await hospitalService.rejectReferral(req.user.id, req.params.id, req.body.remarks);
+    const result = await hospitalService.rejectReferral(req.user.hospitalId, req.params.id, req.body.remarks);
     return apiResponse(res, 200, true, result.message, result.data);
   });
 
-  getDoctors = asyncHandler(async (req, res) => {
-    const result = await hospitalService.getDoctors(req.user.id, req.query);
+  createEmployee = asyncHandler(async (req, res) => {
+    const result = await hospitalService.createEmployee(req.user.hospitalId, req.body);
+    return apiResponse(res, 201, true, result.message, result.data);
+  });
+
+  getEmployees = asyncHandler(async (req, res) => {
+    const result = await hospitalService.getEmployees(req.user.hospitalId, req.query);
     return apiResponse(res, 200, true, result.message, result.data, null, result.meta);
+  });
+
+  updateEmployeeStatus = asyncHandler(async (req, res) => {
+    const result = await hospitalService.updateEmployeeStatus(req.user.hospitalId, req.params.id, req.body.isActive);
+    return apiResponse(res, 200, true, result.message, result.data);
+  });
+
+  updateEmployeeDetails = asyncHandler(async (req, res) => {
+    const result = await hospitalService.updateEmployeeDetails(req.user.hospitalId, req.params.id, req.body);
+    return apiResponse(res, 200, true, result.message, result.data);
   });
 
   // Generic CRUD
@@ -78,7 +93,10 @@ class HospitalController {
     const result = await hospitalService.deleteHospital(req.params.id);
     return apiResponse(res, 200, true, result.message, result.data);
   });
+  getStats = asyncHandler(async (req, res) => {
+    const result = await hospitalService.getDashboardStats(req.user.hospitalId);
+    return apiResponse(res, 200, true, result.message, result.data);
+  });
 }
-
 
 export const hospitalController = new HospitalController();

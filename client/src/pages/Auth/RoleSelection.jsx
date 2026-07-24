@@ -6,16 +6,6 @@ import { Button } from '@/components/common/Button';
 
 const roles = [
   {
-    id: 'doctor',
-    title: 'Doctor',
-    description: 'Manage patient queues, referrals, and AI assessments.',
-    icon: Stethoscope,
-    color: 'text-cyan-400',
-    bg: 'bg-cyan-500/10',
-    border: 'border-cyan-500/20',
-    hoverBorder: 'hover:border-cyan-500/50'
-  },
-  {
     id: 'hospital',
     title: 'Hospital',
     description: 'Manage resources, ICU availability, and incoming emergencies.',
@@ -34,16 +24,6 @@ const roles = [
     bg: 'bg-rose-500/10',
     border: 'border-rose-500/20',
     hoverBorder: 'hover:border-rose-500/50'
-  },
-  {
-    id: 'admin',
-    title: 'System Admin',
-    description: 'Platform oversight, analytics, and user management.',
-    icon: ShieldCheck,
-    color: 'text-purple-400',
-    bg: 'bg-purple-500/10',
-    border: 'border-purple-500/20',
-    hoverBorder: 'hover:border-purple-500/50'
   }
 ];
 
