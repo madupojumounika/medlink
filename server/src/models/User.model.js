@@ -31,6 +31,10 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    isAvailable: {
+      type: Boolean,
+      default: true, // Only used for ambulance roles to track availability
+    },
   },
   {
     timestamps: true,

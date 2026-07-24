@@ -80,6 +80,20 @@ const referralSchema = new mongoose.Schema(
     completedAt: {
       type: Date,
     },
+    assignedAmbulance: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+    ambulanceStatus: {
+      type: String,
+      enum: ["AVAILABLE", "ASSIGNED", "EN_ROUTE", "ARRIVED", "TRANSPORTING", "COMPLETED"],
+    },
+    dispatchTime: {
+      type: Date,
+    },
+    arrivalTime: {
+      type: Date,
+    },
     isActive: {
       type: Boolean,
       default: true,

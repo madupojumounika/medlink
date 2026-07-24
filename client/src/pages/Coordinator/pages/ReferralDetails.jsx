@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { PageHeader } from '@/components/common/PageHeader';
 import { StatusBadge } from '@/components/common/StatusBadge';
 import { Button } from '@/components/common/Button';
-import { Clock, Send, XCircle, Building, HeartPulse } from 'lucide-react';
+import { Clock, Send, XCircle, Building, HeartPulse, Truck } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useParams, useNavigate } from 'react-router-dom';
 import { api } from '@/lib/api';
@@ -187,6 +187,45 @@ export default function ReferralDetails() {
                         </li>
                       ))}
                     </ul>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          )}
+
+          {referral.assignedAmbulance && (
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="bg-gradient-to-br from-emerald-950/50 to-teal-950/50 border border-emerald-500/30 shadow-sm rounded-2xl p-6 mt-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 bg-emerald-500/10 rounded-lg">
+                  <Truck className="w-5 h-5 text-emerald-400" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-white">Assigned Ambulance</h3>
+                  <p className="text-xs text-emerald-200/60">Transport details</p>
+                </div>
+              </div>
+              
+              <div className="space-y-4">
+                <div className="bg-slate-950/50 p-3 rounded-lg border border-white/5 flex justify-between items-center">
+                  <span className="text-muted-foreground text-xs uppercase tracking-wider">Status</span>
+                  <StatusBadge status={referral.ambulanceStatus === 'AVAILABLE' ? 'available' : 'pending'}>
+                    {referral.ambulanceStatus || 'UNKNOWN'}
+                  </StatusBadge>
+                </div>
+                <div className="bg-slate-950/50 p-3 rounded-lg border border-white/5 flex justify-between items-center">
+                  <span className="text-muted-foreground text-xs uppercase tracking-wider">Driver</span>
+                  <span className="text-sm font-semibold text-white">{referral.assignedAmbulance.fullName || 'N/A'}</span>
+                </div>
+                {referral.dispatchTime && (
+                  <div className="bg-slate-950/50 p-3 rounded-lg border border-white/5 flex justify-between items-center">
+                    <span className="text-muted-foreground text-xs uppercase tracking-wider">Dispatch Time</span>
+                    <span className="text-sm text-emerald-400">{new Date(referral.dispatchTime).toLocaleTimeString()}</span>
+                  </div>
+                )}
+                {referral.arrivalTime && (
+                  <div className="bg-slate-950/50 p-3 rounded-lg border border-white/5 flex justify-between items-center">
+                    <span className="text-muted-foreground text-xs uppercase tracking-wider">Arrival Time</span>
+                    <span className="text-sm text-emerald-400">{new Date(referral.arrivalTime).toLocaleTimeString()}</span>
                   </div>
                 )}
               </div>

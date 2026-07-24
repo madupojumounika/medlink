@@ -1,6 +1,7 @@
 import { referralRepository } from "../repositories/referral.repository.js";
 import { patientRepository } from "../repositories/patient.repository.js";
 import { aiService } from "./ai.service.js";
+import { ambulanceService } from "./ambulance.service.js";
 import { ApiError } from "../utils/ApiError.js";
 import { REFERRAL_STATUS } from "../constants/referral.js";
 
@@ -78,16 +79,18 @@ class ReferralService {
 
     const rec = patient.hospitalRecommendation;
 
+    // Find available ambulance
+    const availableAmbulance = await ambulanceService.findAvailableAmbulance(hospitalId);
+    const waitingTimeMinutes = availableAmbulance ? 10 : 45; // Simulated realistic waiting times
+
     // Call AI Service
     const aiPriority = await aiService.getReferralPriority({
       severity: referral.severity,
       hospitalScore: rec.recommendationScore || 85, // Use recommendation score or default
       distanceKm: rec.distanceKm || 10,
       icuAvailable: rec.icuBedsAvailable > 0,
-      // TODO: Integrate with actual Ambulance Module once implemented
-      ambulanceAvailable: true, 
-      // TODO: Fetch live hospital waiting times once tracking module is built
-      waitingTimeMinutes: 30, 
+      ambulanceAvailable: !!availableAmbulance, 
+      waitingTimeMinutes, 
     });
 
     if (
@@ -116,8 +119,29 @@ class ReferralService {
       }
     };
 
-    const updatedReferral = await referralRepository.updateStatus(referralId, updateData);
-    return { message: "Referral sent successfully", data: updatedReferral };
+    // Auto-assign ambulance for high-priority cases
+    if (["Urgent", "Critical", "Emergency"].includes(aiPriority.priority)) {
+      if (availableAmbulance) {
+        updateData.assignedAmbulance = availableAmbulance._id;
+        updateData.ambulanceStatus = "ASSIGNED";
+        // Optionally update remarks
+        updateData.remarks += ` (Auto-assigned Ambulance: ${availableAmbulance.fullName})`;
+      } else {
+        updateData.remarks += " (CRITICAL: No available ambulances. Manual intervention required!)";
+      }
+    }
+
+    try {
+      const updatedReferral = await referralRepository.updateStatus(referralId, updateData);
+      return { message: "Referral sent successfully", data: updatedReferral };
+    } catch (error) {
+      // Rollback ambulance lock if database write fails
+      if (availableAmbulance) {
+        const User = (await import("../models/User.model.js")).default;
+        await User.findByIdAndUpdate(availableAmbulance._id, { isAvailable: true });
+      }
+      throw error;
+    }
   }
 
   async cancelReferral(hospitalId, userId, referralId, remarks) {
@@ -137,6 +161,16 @@ class ReferralService {
       updatedBy: userId,
       remarks: remarks || "Cancelled by Coordinator",
     };
+
+    // If an ambulance was assigned, release it
+    if (referral.assignedAmbulance) {
+      const User = (await import("../models/User.model.js")).default;
+      await User.findByIdAndUpdate(
+        referral.assignedAmbulance._id || referral.assignedAmbulance, 
+        { isAvailable: true }
+      );
+      updateData.ambulanceStatus = "AVAILABLE"; 
+    }
 
     const updatedReferral = await referralRepository.updateStatus(referralId, updateData);
     return { message: "Referral cancelled successfully", data: updatedReferral };
@@ -184,6 +218,16 @@ class ReferralService {
       updatedBy: userId,
       remarks: remarks || "Rejected by Receiving Hospital due to capacity/resources"
     };
+
+    // If an ambulance was assigned, release it since the receiving hospital refused the transfer
+    if (referral.assignedAmbulance) {
+      const User = (await import("../models/User.model.js")).default;
+      await User.findByIdAndUpdate(
+        referral.assignedAmbulance._id || referral.assignedAmbulance, 
+        { isAvailable: true }
+      );
+      updateData.ambulanceStatus = "AVAILABLE"; 
+    }
 
     const updatedReferral = await referralRepository.updateStatus(referralId, updateData);
     return { message: "Referral rejected successfully", data: updatedReferral };
