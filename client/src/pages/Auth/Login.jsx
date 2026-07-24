@@ -177,7 +177,7 @@ export default function Login() {
           <Checkbox
             id="rememberMe"
             checked={rememberMe}
-            onCheckedChange={(checked) => setValue('rememberMe', checked)}
+            onChange={(e) => setValue('rememberMe', e.target.checked)}
             disabled={isLoading}
           />
           <Label htmlFor="rememberMe" className="font-normal cursor-pointer text-muted-foreground">
