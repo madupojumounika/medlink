@@ -54,7 +54,8 @@ class ReferralRepository {
       .populate("patientId")
       .populate("doctorId", "fullName")
       .populate("fromHospitalId", "name")
-      .populate("toHospitalId", "name");
+      .populate("toHospitalId", "name")
+      .populate("assignedAmbulance", "fullName email");
   }
 
   async updateStatus(referralId, updateData) {

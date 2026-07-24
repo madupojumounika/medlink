@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { hospitalRepository } from "../repositories/hospital.repository.js";
 import { patientRepository } from "../repositories/patient.repository.js";
+import { aiService } from "./ai.service.js";
 import { ApiError } from "../utils/ApiError.js";
 import { REFERRAL_STATUS } from "../constants/referral.js";
 
@@ -254,6 +255,49 @@ class HospitalService {
 
     const updatedProfile = await hospitalRepository.updateEmployeeProfile(employeeId, user.role, details);
     return { message: "Employee details updated successfully", data: updatedProfile };
+  }
+
+  async recommendHospital(hospitalId, patientId, specialty, severity) {
+    const hospital = await hospitalRepository.getHospitalById(hospitalId);
+    if (!hospital) throw new ApiError(404, "Hospital not found");
+    
+    if (hospital.latitude == null || hospital.longitude == null) {
+      throw new ApiError(400, "Hospital location (latitude/longitude) is not configured");
+    }
+
+    const patient = await patientRepository.getPatientById(patientId);
+    if (!patient) throw new ApiError(404, "Patient not found");
+    if (patient.currentHospitalId?.toString() !== hospitalId.toString()) {
+      throw new ApiError(403, "Patient is not currently assigned to your hospital");
+    }
+
+    const aiResponse = await aiService.recommendHospital({
+      severity: severity || patient.severity || patient.aiAssessment?.severity || "Medium",
+      specialty,
+      latitude: hospital.latitude,
+      longitude: hospital.longitude,
+    });
+
+    if (!aiResponse.success || !aiResponse.recommended_hospital) {
+      throw new ApiError(500, "Invalid recommendation received from AI Service");
+    }
+
+    const recData = aiResponse.recommended_hospital;
+    const updateData = {
+      hospitalRecommendation: {
+        recommendedHospital: recData.hospital_name,
+        recommendationScore: recData.recommendation_score,
+        distanceKm: recData.distance_km,
+        icuBedsAvailable: recData.icu_beds_available,
+        availableDoctors: recData.available_doctors,
+        specialty: recData.specialty,
+        recommendationReasons: recData.reason || [],
+        recommendationTimestamp: new Date(),
+      }
+    };
+
+    const updatedPatient = await patientRepository.updatePatient(patientId, updateData);
+    return { message: "Hospital recommendation completed", data: updatedPatient.hospitalRecommendation };
   }
 
   async createHospital(hospitalData) {

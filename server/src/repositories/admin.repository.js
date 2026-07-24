@@ -1,6 +1,67 @@
+import User from '../models/User.model.js';
+import Hospital from '../models/Hospital.model.js';
+import Patient from '../models/Patient.model.js';
+import Referral from '../models/Referral.model.js';
+import mongoose from 'mongoose';
+
 class AdminRepository {
   async getDashboard() {
-    throw new Error('Method not implemented: getDashboard');
+    // Execute aggregations in parallel
+    const [userStats, hospitalStats, patientStats, referralData, recentActivity] = await Promise.all([
+      User.aggregate([
+        {
+          $facet: {
+            doctors: [{ $match: { role: 'doctor', isActive: true } }, { $count: 'count' }],
+            ambulances: [{ $match: { role: 'ambulance', isActive: true } }, { $count: 'count' }],
+            ambulanceStatus: [
+              { $match: { role: 'ambulance', isActive: true } },
+              { $group: { _id: '$isAvailable', count: { $sum: 1 } } }
+            ]
+          }
+        }
+      ]),
+      Hospital.aggregate([{ $match: { isActive: true } }, { $count: 'count' }]),
+      Patient.aggregate([{ $match: { isActive: true } }, { $count: 'count' }]),
+      Referral.aggregate([
+        { $match: { isActive: true } },
+        {
+          $facet: {
+            statusCounts: [
+              { $group: { _id: '$status', count: { $sum: 1 } } }
+            ],
+            severityCounts: [
+              { $group: { _id: '$severity', count: { $sum: 1 } } }
+            ],
+            priorityCounts: [
+              { $group: { _id: '$aiPriorityAssessment.priority', count: { $sum: 1 } } }
+            ],
+            ambulanceStatusCounts: [
+              { $match: { ambulanceStatus: { $exists: true } } },
+              { $group: { _id: '$ambulanceStatus', count: { $sum: 1 } } }
+            ],
+            hospitalCounts: [
+              { $match: { toHospitalId: { $exists: true } } },
+              { $group: { _id: '$toHospitalId', count: { $sum: 1 } } }
+            ]
+          }
+        }
+      ]),
+      Referral.find({ isActive: true })
+        .sort({ createdAt: -1 })
+        .limit(10)
+        .populate('patientId', 'name')
+        .populate('fromHospitalId', 'hospitalName')
+        .populate('toHospitalId', 'hospitalName')
+        .lean()
+    ]);
+
+    return {
+      userStats: userStats[0],
+      hospitalStats: hospitalStats[0],
+      patientStats: patientStats[0],
+      referralData: referralData[0],
+      recentActivity,
+    };
   }
 
   async getUsers(filters, pagination) {

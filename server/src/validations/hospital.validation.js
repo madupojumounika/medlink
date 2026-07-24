@@ -42,3 +42,9 @@ export const referralCreationValidation = [
   body("diagnosis").notEmpty().withMessage("Diagnosis is required"),
   body("notes").optional().isString(),
 ];
+
+export const recommendationValidation = [
+  param("id").notEmpty().withMessage("Patient ID is required"),
+  body("specialty").notEmpty().withMessage("Required specialty is required"),
+  body("severity").isIn(["Low", "Medium", "High", "Critical"]).withMessage("Valid severity is required"),
+];

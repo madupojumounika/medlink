@@ -1,17 +1,77 @@
 import adminRepository from '../repositories/admin.repository.js';
+import { aiService } from './ai.service.js';
+import mongoose from 'mongoose';
+import { logger } from '../utils/logger.js';
 
 class AdminService {
   async getDashboardOverview() {
-    return {
-      message: 'Dashboard data will be available after MongoDB integration.',
-      data: {
-        totalUsers: 0,
-        totalDoctors: 0,
-        totalHospitals: 0,
-        totalAmbulances: 0,
-        activeEmergencies: 0,
-      },
-    };
+    const startTime = performance.now();
+    try {
+      // Execute DB aggregations and AI health check in parallel
+      const [dbData, aiHealth] = await Promise.all([
+        adminRepository.getDashboard(),
+        aiService.checkAIHealth()
+      ]);
+
+      const { userStats, hospitalStats, patientStats, referralData, recentActivity } = dbData;
+
+      const systemStats = {
+        totalDoctors: userStats?.doctors?.[0]?.count || 0,
+        totalHospitals: hospitalStats?.count || 0,
+        totalAmbulances: userStats?.ambulances?.[0]?.count || 0,
+        totalPatients: patientStats?.count || 0,
+        totalReferrals: referralData?.statusCounts?.reduce((sum, item) => sum + item.count, 0) || 0,
+        pendingReferrals: referralData?.statusCounts?.find(s => s._id === 'Pending')?.count || 0,
+        completedReferrals: referralData?.statusCounts?.find(s => s._id === 'Completed')?.count || 0,
+        cancelledReferrals: referralData?.statusCounts?.find(s => s._id === 'Cancelled')?.count || 0,
+        rejectedReferrals: referralData?.statusCounts?.find(s => s._id === 'Rejected')?.count || 0,
+        emergencyReferrals: referralData?.priorityCounts?.find(s => s._id === 'Emergency' || s._id === 'Critical')?.count || 0, // Fallback if Critical/Emergency mapped together
+        criticalReferrals: referralData?.priorityCounts?.find(s => s._id === 'Critical')?.count || 0,
+      };
+
+      const aiAnalytics = {
+        severityDistribution: (referralData?.severityCounts || []).map(item => ({ name: item._id || 'Unknown', value: item.count })),
+        priorityDistribution: (referralData?.priorityCounts || []).map(item => ({ name: item._id || 'Unknown', value: item.count })),
+        predictionSuccessCount: systemStats.totalReferrals, // Assuming successfully processed referrals used AI
+      };
+
+      const ambulanceAnalytics = {
+        ambulanceStatusDistribution: (userStats?.ambulanceStatus || []).map(item => ({ name: item._id ? 'Available' : 'Busy', value: item.count })),
+        assignedAmbulances: referralData?.ambulanceStatusCounts?.find(s => s._id === 'ASSIGNED')?.count || 0,
+        enRouteAmbulances: referralData?.ambulanceStatusCounts?.find(s => s._id === 'EN_ROUTE')?.count || 0,
+        transportingAmbulances: referralData?.ambulanceStatusCounts?.find(s => s._id === 'TRANSPORTING')?.count || 0,
+        completedTrips: referralData?.ambulanceStatusCounts?.find(s => s._id === 'COMPLETED')?.count || 0,
+      };
+
+      const hospitalAnalytics = {
+        hospitalReferralDistribution: (referralData?.hospitalCounts || []).map(item => ({ name: item._id ? item._id.toString().substring(0, 5) : 'Unknown', value: item.count })),
+      };
+
+      const systemHealth = {
+        nodeBackend: 'Online',
+        mongoDB: mongoose.connection.readyState === 1 ? 'Online' : 'Offline',
+        fastAPI: aiHealth ? 'Online' : 'Offline',
+        currentServerTime: new Date().toISOString(),
+      };
+
+      const executionTime = (performance.now() - startTime).toFixed(2);
+      logger.info(`[ADMIN_DASHBOARD] Analytics generated in ${executionTime}ms`);
+
+      return {
+        message: 'Dashboard data retrieved successfully.',
+        data: {
+          systemStats,
+          aiAnalytics,
+          ambulanceAnalytics,
+          hospitalAnalytics,
+          systemHealth,
+          recentActivity,
+        },
+      };
+    } catch (error) {
+      logger.error(`[ADMIN_DASHBOARD] Aggregation error: ${error.message}`);
+      throw error;
+    }
   }
 
   async getAllUsers(filters, pagination) {

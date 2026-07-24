@@ -60,6 +60,13 @@ const referralSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    aiPriorityAssessment: {
+      priority: { type: String },
+      estimatedTransferTime: { type: String },
+      reasoning: [{ type: String }],
+      recommendedTransfer: { type: String },
+      recommendationTimestamp: { type: Date, default: Date.now }
+    },
     coordinatorId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -71,6 +78,20 @@ const referralSchema = new mongoose.Schema(
       type: Date,
     },
     completedAt: {
+      type: Date,
+    },
+    assignedAmbulance: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+    ambulanceStatus: {
+      type: String,
+      enum: ["AVAILABLE", "ASSIGNED", "EN_ROUTE", "ARRIVED", "TRANSPORTING", "COMPLETED"],
+    },
+    dispatchTime: {
+      type: Date,
+    },
+    arrivalTime: {
       type: Date,
     },
     isActive: {
