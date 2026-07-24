@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
 import { useParams, useNavigate } from 'react-router-dom';
 import { api } from '@/lib/api';
 import { Loader } from '@/components/common/Loader';
-
+import AISeverityAssessment from './AISeverityAssessment';
 
 export default function PatientDetails() {
   const navigate = useNavigate();
@@ -174,6 +174,14 @@ export default function PatientDetails() {
           </motion.div>
         </div>
       </div>
+      
+      {/* AI Assessment Section */}
+      {!isReferred && (
+        <AISeverityAssessment 
+          patient={patient} 
+          onAssessmentComplete={(updatedPatient) => setPatient(updatedPatient)}
+        />
+      )}
     </div>
   );
 }

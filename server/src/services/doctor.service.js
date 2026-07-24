@@ -1,4 +1,5 @@
 import { doctorRepository } from "../repositories/doctor.repository.js";
+import { aiService } from "./ai.service.js";
 import { ApiError } from "../utils/ApiError.js";
 
 const getPaginationOptions = (query) => {
@@ -80,6 +81,50 @@ class DoctorService {
 
     const updatedPatient = await doctorRepository.updatePatient(patientId, updateData);
     return { message: "Patient updated successfully", data: updatedPatient };
+  }
+
+  async predictSeverity(userId, patientId, vitals) {
+    // 1. Get Patient and Verify Doctor
+    const patient = await doctorRepository.getPatientById(patientId);
+    if (!patient) throw new ApiError(404, "Patient not found");
+    
+    const doctorProfile = await doctorRepository.getDoctorProfileByUserId(userId);
+    if (patient.createdByDoctorId.toString() !== doctorProfile._id.toString()) {
+      throw new ApiError(403, "Not authorized to update this patient");
+    }
+
+    // 2. Call AI Service
+    const aiResponse = await aiService.predictSeverity({
+      age: patient.age,
+      gender: patient.gender,
+      vitals: vitals
+    });
+
+    if (!aiResponse.success) {
+      throw new ApiError(500, "AI Prediction failed");
+    }
+
+    const { severity, confidence, risk_score, recommendation } = aiResponse.prediction;
+
+    // 3. Update Patient with Vitals and AI Assessment
+    const updateData = {
+      vitals,
+      severity,
+      aiAssessment: {
+        severity,
+        confidence,
+        riskScore: risk_score,
+        recommendation,
+        predictionTimestamp: new Date()
+      }
+    };
+
+    const updatedPatient = await doctorRepository.updatePatient(patientId, updateData);
+
+    return { 
+      message: "Severity prediction completed", 
+      data: updatedPatient 
+    };
   }
 
   async getReferrals(userId, queryParams = {}) {
