@@ -265,7 +265,7 @@ class HospitalService {
       throw new ApiError(400, "Hospital location (latitude/longitude) is not configured");
     }
 
-    const patient = await patientRepository.getPatientById(patientId);
+    const patient = await patientRepository.findById(patientId, hospitalId);
     if (!patient) throw new ApiError(404, "Patient not found");
     if (patient.currentHospitalId?.toString() !== hospitalId.toString()) {
       throw new ApiError(403, "Patient is not currently assigned to your hospital");

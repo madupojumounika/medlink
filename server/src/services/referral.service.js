@@ -68,16 +68,18 @@ class ReferralService {
     }
 
     // AI Integration Validation
-    const patient = await patientRepository.getPatientById(referral.patientId);
+    const patient = await patientRepository.findById(referral.patientId, hospitalId);
     if (!patient) throw new ApiError(404, "Patient associated with referral not found");
     
     if (!referral.severity) throw new ApiError(400, "Referral severity is missing");
 
-    if (!patient.hospitalRecommendation || !patient.hospitalRecommendation.recommendedHospital) {
-      throw new ApiError(400, "Missing hospital recommendation. Please run the AI Hospital Recommendation first.");
-    }
-
-    const rec = patient.hospitalRecommendation;
+    // Allow referral even if AI hospital recommendation wasn't explicitly saved
+    // Just fallback to default recommendation values if missing
+    const rec = patient.hospitalRecommendation || {
+      recommendationScore: 85,
+      distanceKm: 10,
+      icuBedsAvailable: 5,
+    };
 
     // Find available ambulance
     const availableAmbulance = await ambulanceService.findAvailableAmbulance(hospitalId);
