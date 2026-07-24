@@ -60,6 +60,13 @@ const referralSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    aiPriorityAssessment: {
+      priority: { type: String },
+      estimatedTransferTime: { type: String },
+      reasoning: [{ type: String }],
+      recommendedTransfer: { type: String },
+      recommendationTimestamp: { type: Date, default: Date.now }
+    },
     coordinatorId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

@@ -142,6 +142,56 @@ export default function ReferralDetails() {
               {referral.notes || 'No additional notes provided.'}
             </p>
           </motion.div>
+
+          {referral.aiPriorityAssessment && (
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-gradient-to-br from-indigo-950/50 to-blue-950/50 border border-indigo-500/30 shadow-sm rounded-2xl p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 bg-indigo-500/10 rounded-lg">
+                  <Clock className="w-5 h-5 text-indigo-400" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-white">AI Priority Assessment</h3>
+                  <p className="text-xs text-indigo-200/60">Calculated during referral creation</p>
+                </div>
+              </div>
+              
+              <div className="grid md:grid-cols-2 gap-4 mb-4">
+                <div className="bg-slate-950/50 p-3 rounded-lg border border-white/5">
+                  <div className="text-muted-foreground text-xs uppercase tracking-wider mb-1">Priority Level</div>
+                  <div className="flex items-center gap-2">
+                    <StatusBadge status={referral.aiPriorityAssessment.priority === 'Critical' ? 'critical' : 'pending'}>
+                      {referral.aiPriorityAssessment.priority}
+                    </StatusBadge>
+                  </div>
+                </div>
+                <div className="bg-slate-950/50 p-3 rounded-lg border border-white/5">
+                  <div className="text-muted-foreground text-xs uppercase tracking-wider mb-1">Est. Transfer Time</div>
+                  <div className="text-lg font-bold text-white">
+                    {referral.aiPriorityAssessment.estimatedTransferTime}
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-slate-950/50 p-4 rounded-lg border border-white/5 space-y-3">
+                <div>
+                  <div className="text-muted-foreground text-xs uppercase tracking-wider mb-1">Recommendation</div>
+                  <div className="text-sm text-slate-200 font-medium">{referral.aiPriorityAssessment.recommendedTransfer}</div>
+                </div>
+                {referral.aiPriorityAssessment.reasoning && referral.aiPriorityAssessment.reasoning.length > 0 && (
+                  <div className="pt-2 border-t border-white/10">
+                    <div className="text-muted-foreground text-xs uppercase tracking-wider mb-2">Reasoning</div>
+                    <ul className="space-y-1">
+                      {referral.aiPriorityAssessment.reasoning.map((r, i) => (
+                        <li key={i} className="text-xs text-slate-300 flex items-start gap-2">
+                          <span className="text-indigo-500">•</span> {r}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          )}
         </div>
 
         {/* Right Column: Recommendations & Action */}
