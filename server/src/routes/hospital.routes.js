@@ -5,6 +5,7 @@ import {
   resourcesValidation,
   referralActionValidation,
   referralCreationValidation,
+  recommendationValidation,
   validate
 } from "../validations/hospital.validation.js";
 import { authenticate } from "../middleware/authenticate.js";
@@ -36,6 +37,14 @@ router.put("/employees/:id/details", hospitalController.updateEmployeeDetails);
 router.post("/referrals", referralCreationValidation, validate, hospitalController.createReferral);
 router.get("/referrals", hospitalController.getReferrals);
 router.get("/referrals/:id", hospitalController.getReferralById);
+
+// AI Recommendation
+router.post(
+  "/patients/:id/recommend-hospital",
+  recommendationValidation,
+  validate,
+  hospitalController.recommendHospital
+);
 
 router.put(
   "/referrals/:id/accept",

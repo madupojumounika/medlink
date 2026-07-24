@@ -9,6 +9,7 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts'
 import { motion } from 'framer-motion';
 import { api } from '@/lib/api';
 import { Loader } from '@/components/common/Loader';
+import { AIHospitalRecommendation } from '../components/AIHospitalRecommendation';
 
 const chartData = [
   { time: '00:00', patients: 12 }, { time: '04:00', patients: 8 },
@@ -55,6 +56,9 @@ export default function HospitalDashboard() {
         <MetricCard title="Active Doctors" value={stats?.activeDoctorsCount || 0} description="Currently on shift" icon={Users} trend={{ isPositive: true, value: 0 }} />
         <MetricCard title="Avg Triage Time" value={stats?.avgTriageTime || "N/A"} description="Past 24 hours" icon={Activity} trend={{ isPositive: true, value: 0 }} />
       </div>
+
+      {/* AI Hospital Recommendation Widget */}
+      <AIHospitalRecommendation />
 
       <div className="grid lg:grid-cols-3 gap-6">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="lg:col-span-2">

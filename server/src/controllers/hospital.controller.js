@@ -68,6 +68,12 @@ class HospitalController {
     return apiResponse(res, 200, true, result.message, result.data);
   });
 
+  recommendHospital = asyncHandler(async (req, res) => {
+    const { specialty, severity } = req.body;
+    const result = await hospitalService.recommendHospital(req.user.hospitalId, req.params.id, specialty, severity);
+    return apiResponse(res, 200, true, result.message, result.data);
+  });
+
   // Generic CRUD
   createHospital = asyncHandler(async (req, res) => {
     const result = await hospitalService.createHospital(req.body);

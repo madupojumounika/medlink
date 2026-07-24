@@ -81,6 +81,16 @@ const patientSchema = new mongoose.Schema(
       recommendation: { type: String },
       predictionTimestamp: { type: Date }
     },
+    hospitalRecommendation: {
+      recommendedHospital: { type: String },
+      recommendationScore: { type: Number },
+      distanceKm: { type: Number },
+      icuBedsAvailable: { type: Number },
+      availableDoctors: { type: Number },
+      specialty: { type: String },
+      recommendationReasons: [{ type: String }],
+      recommendationTimestamp: { type: Date, default: Date.now }
+    },
     doctorNotes: {
       type: String,
       trim: true,
