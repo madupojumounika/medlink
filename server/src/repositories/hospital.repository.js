@@ -69,12 +69,31 @@ class HospitalRepository {
 
   async getEmployees(query, options) {
     const { sort, skip, limit } = options;
-    const data = await User.find({ ...query, isActive: true })
+    const users = await User.find({ ...query, isActive: true })
       .select("-password")
       .sort(sort)
       .skip(skip)
       .limit(limit)
       .lean();
+
+    const data = await Promise.all(
+      users.map(async (u) => {
+        if (u.role === "doctor") {
+          const profile = await DoctorProfile.findOne({ userId: u._id }).lean();
+          return {
+            ...u,
+            profile,
+            onDuty: profile?.onDuty ?? profile?.availability ?? u.onDuty ?? u.isAvailable ?? true,
+            availability: profile?.availability ?? profile?.onDuty ?? u.isAvailable ?? u.onDuty ?? true,
+            specialization: profile?.specialization || profile?.qualifications?.join(", ") || "General Practitioner",
+            department: profile?.department || "Emergency / General",
+            licenseNumber: profile?.licenseNumber || "MD-N/A",
+          };
+        }
+        return u;
+      })
+    );
+
     const total = await User.countDocuments({ ...query, isActive: true });
     return { data, total };
   }

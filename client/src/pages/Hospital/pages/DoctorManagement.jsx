@@ -91,35 +91,53 @@ export default function DoctorManagement() {
                   <th className="px-6 py-4 font-medium">Name</th>
                   <th className="px-6 py-4 font-medium">Email</th>
                   <th className="px-6 py-4 font-medium">Role</th>
-                  <th className="px-6 py-4 font-medium">Status</th>
+                  <th className="px-6 py-4 font-medium">Duty Status</th>
+                  <th className="px-6 py-4 font-medium">Account Status</th>
                   <th className="px-6 py-4 font-medium text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y">
-                {staff.map((employee) => (
-                  <tr key={employee._id} className="hover:bg-muted/30 transition-colors">
-                    <td className="px-6 py-4 font-medium">{employee.fullName}</td>
-                    <td className="px-6 py-4 text-muted-foreground">{employee.email}</td>
-                    <td className="px-6 py-4 capitalize">{employee.role.replace('_', ' ')}</td>
-                    <td className="px-6 py-4">
-                      <StatusBadge status={employee.isActive ? 'available' : 'critical'}>
-                        {employee.isActive ? 'Active' : 'Inactive'}
-                      </StatusBadge>
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={() => toggleStatus(employee._id, employee.isActive)}
-                      >
-                        {employee.isActive ? 'Deactivate' : 'Activate'}
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
+                {staff.map((employee) => {
+                  const isDrOnDuty = employee.onDuty ?? employee.availability ?? true;
+                  return (
+                    <tr key={employee._id} className="hover:bg-muted/30 transition-colors">
+                      <td className="px-6 py-4 font-medium">{employee.fullName}</td>
+                      <td className="px-6 py-4 text-muted-foreground">{employee.email}</td>
+                      <td className="px-6 py-4 capitalize">{employee.role.replace('_', ' ')}</td>
+                      <td className="px-6 py-4">
+                        {employee.role === 'doctor' ? (
+                          <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold border ${
+                            isDrOnDuty 
+                              ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' 
+                              : 'bg-rose-500/10 text-rose-400 border-rose-500/30'
+                          }`}>
+                            <span className={`h-1.5 w-1.5 rounded-full ${isDrOnDuty ? 'bg-emerald-400 animate-pulse' : 'bg-rose-400'}`} />
+                            {isDrOnDuty ? 'On Duty' : 'Off Duty'}
+                          </span>
+                        ) : (
+                          <span className="text-muted-foreground text-xs font-mono">N/A</span>
+                        )}
+                      </td>
+                      <td className="px-6 py-4">
+                        <StatusBadge status={employee.isActive ? 'available' : 'critical'}>
+                          {employee.isActive ? 'Active' : 'Inactive'}
+                        </StatusBadge>
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => toggleStatus(employee._id, employee.isActive)}
+                        >
+                          {employee.isActive ? 'Deactivate' : 'Activate'}
+                        </Button>
+                      </td>
+                    </tr>
+                  );
+                })}
                 {staff.length === 0 && (
                   <tr>
-                    <td colSpan="5" className="px-6 py-8 text-center text-muted-foreground">
+                    <td colSpan="6" className="px-6 py-8 text-center text-muted-foreground">
                       No staff found.
                     </td>
                   </tr>

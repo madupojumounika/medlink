@@ -33,7 +33,11 @@ const userSchema = new mongoose.Schema(
     },
     isAvailable: {
       type: Boolean,
-      default: true, // Only used for ambulance roles to track availability
+      default: true, // Used for ambulance roles and availability tracking
+    },
+    onDuty: {
+      type: Boolean,
+      default: true, // Used for doctor duty status tracking
     },
   },
   {

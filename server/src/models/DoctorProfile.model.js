@@ -41,6 +41,10 @@ const doctorProfileSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    onDuty: {
+      type: Boolean,
+      default: true,
+    },
     phone: {
       type: String,
       trim: true,

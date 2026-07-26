@@ -23,6 +23,12 @@ class DoctorService {
     return { message: "Profile updated successfully", data: profile };
   }
 
+  async updateDutyStatus(userId, onDuty) {
+    const profile = await doctorRepository.updateDutyStatus(userId, onDuty);
+    if (!profile) throw new ApiError(404, "Doctor profile not found");
+    return { message: "Duty status updated successfully", data: profile };
+  }
+
   async createPatient(userId, patientData) {
     const doctorProfile = await doctorRepository.getDoctorProfileByUserId(userId);
     if (!doctorProfile) throw new ApiError(404, "Doctor profile not found");

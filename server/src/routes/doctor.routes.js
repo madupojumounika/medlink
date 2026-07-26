@@ -3,6 +3,7 @@ import { doctorController } from "../controllers/doctor.controller.js";
 import {
   patientValidation,
   profileUpdateValidation,
+  dutyStatusValidation,
   vitalsValidation,
   validate
 } from "../validations/doctor.validation.js";
@@ -15,6 +16,7 @@ router.use(authenticate, authorize("doctor"));
 
 router.get("/profile", doctorController.getProfile);
 router.put("/profile", profileUpdateValidation, validate, doctorController.updateProfile);
+router.patch("/duty-status", dutyStatusValidation, validate, doctorController.updateDutyStatus);
 
 router.post("/patients", patientValidation, validate, doctorController.createPatient);
 router.get("/patients", doctorController.getPatients);

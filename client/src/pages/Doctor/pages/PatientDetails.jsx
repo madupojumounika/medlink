@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { PageHeader } from '@/components/common/PageHeader';
 import { StatusBadge } from '@/components/common/StatusBadge';
 import { Button } from '@/components/common/Button';
-import { Activity, Clock, FileText, Upload, User, MapPin, Phone, AlertTriangle, Send } from 'lucide-react';
+import { Phone, Send } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useParams, useNavigate } from 'react-router-dom';
 import { api } from '@/lib/api';
@@ -102,21 +102,6 @@ export default function PatientDetails() {
                   {patient.symptoms || 'No symptoms recorded.'}
                 </p>
               </div>
-
-              <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <div className="text-muted-foreground text-sm mb-1 uppercase tracking-wider font-semibold">Allergies</div>
-                  <div className="bg-muted/30 p-3 rounded-lg border border-border">
-                    {patient.allergies?.length > 0 ? patient.allergies.join(', ') : 'None reported'}
-                  </div>
-                </div>
-                <div>
-                  <div className="text-muted-foreground text-sm mb-1 uppercase tracking-wider font-semibold">Existing Conditions</div>
-                  <div className="bg-muted/30 p-3 rounded-lg border border-border">
-                    {patient.existingConditions?.length > 0 ? patient.existingConditions.join(', ') : 'None reported'}
-                  </div>
-                </div>
-              </div>
             </div>
           </motion.div>
 
@@ -138,20 +123,6 @@ export default function PatientDetails() {
                 <div>
                   <div className="text-sm font-medium text-foreground">{patient.phone || 'N/A'}</div>
                   <div className="text-xs text-muted-foreground">Primary Phone</div>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <AlertTriangle className="w-5 h-5 text-rose-500 mt-0.5" />
-                <div>
-                  <div className="text-sm font-medium text-foreground">{patient.emergencyContact || 'N/A'}</div>
-                  <div className="text-xs text-muted-foreground">Emergency Contact</div>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <MapPin className="w-5 h-5 text-muted-foreground mt-0.5" />
-                <div>
-                  <div className="text-sm font-medium text-foreground">{patient.address || 'N/A'}</div>
-                  <div className="text-xs text-muted-foreground">Address</div>
                 </div>
               </div>
             </div>

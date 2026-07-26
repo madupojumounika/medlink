@@ -3,6 +3,14 @@ import { aiService } from './ai.service.js';
 import mongoose from 'mongoose';
 import { logger } from '../utils/logger.js';
 
+const getPaginationOptions = (query = {}) => {
+  const page = parseInt(query.page, 10) || 1;
+  const limit = parseInt(query.limit, 10) || 20;
+  const skip = (page - 1) * limit;
+  const sort = query.sort ? { [query.sort]: query.order === 'desc' ? -1 : 1 } : { createdAt: -1 };
+  return { page, limit, skip, sort };
+};
+
 class AdminService {
   async getDashboardOverview() {
     const startTime = performance.now();
@@ -102,10 +110,18 @@ class AdminService {
     };
   }
 
-  async getAllDoctors(filters, pagination) {
+  async getAllDoctors(filters = {}, pagination = {}) {
+    const options = getPaginationOptions(pagination);
+    const { data, total } = await adminRepository.getDoctors(filters, options);
     return {
-      message: 'Doctor list will be available after MongoDB integration.',
-      data: [],
+      message: 'Doctors retrieved successfully.',
+      data,
+      meta: {
+        page: options.page,
+        limit: options.limit,
+        total,
+        totalPages: Math.ceil(total / options.limit) || 1,
+      },
     };
   }
 

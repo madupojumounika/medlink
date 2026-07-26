@@ -30,7 +30,13 @@ export const vitalsValidation = [
 
 
 export const profileUpdateValidation = [
-  body("firstName").notEmpty().withMessage("First name is required"),
-  body("lastName").notEmpty().withMessage("Last name is required"),
-  body("specialization").notEmpty().withMessage("Specialization is required"),
+  body("firstName").optional().notEmpty().withMessage("First name cannot be empty if provided"),
+  body("lastName").optional().notEmpty().withMessage("Last name cannot be empty if provided"),
+  body("specialization").optional().notEmpty().withMessage("Specialization cannot be empty if provided"),
+  body("availability").optional().isBoolean().withMessage("Availability must be a boolean"),
+  body("onDuty").optional().isBoolean().withMessage("onDuty must be a boolean"),
+];
+
+export const dutyStatusValidation = [
+  body("onDuty").notEmpty().withMessage("onDuty status is required").isBoolean().withMessage("onDuty must be a boolean"),
 ];
