@@ -25,8 +25,8 @@ venv/
 htmlcov/
 
 # Trained Models (Generated files)
-trained_models/
-*.pkl
+# trained_models/
+# *.pkl
 *.joblib
 *.h5
 *.pth
