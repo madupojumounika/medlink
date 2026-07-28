@@ -49,6 +49,12 @@ export const registerValidation = [
 ];
 
 export const loginValidation = [
-  body("email").isEmail().withMessage("Valid email is required"),
+  body().custom((value, { req }) => {
+    const id = req.body.email || req.body.username || req.body.identifier || req.body.userId;
+    if (!id || typeof id !== "string" || id.trim() === "") {
+      throw new Error("Email or User ID is required");
+    }
+    return true;
+  }),
   body("password").notEmpty().withMessage("Password is required"),
 ];

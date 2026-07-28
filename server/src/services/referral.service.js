@@ -29,22 +29,22 @@ class ReferralService {
   }
 
   async getRecommendations(hospitalId, referralId) {
-    
+
     const referral = await referralRepository.getById(referralId, hospitalId);
     if (!referral) {
       throw new ApiError(404, "Referral not found");
     }
 
-    
+
     const Hospital = (await import("../models/Hospital.model.js")).default;
-    
-    
+
+
     const otherHospitals = await Hospital.find({ _id: { $ne: hospitalId }, isActive: true }).limit(3).lean();
 
     const recommendations = otherHospitals.map(hosp => ({
       id: hosp._id.toString(),
       name: hosp.hospitalName,
-      score: Math.floor(Math.random() * 20 + 80), 
+      score: Math.floor(Math.random() * 20 + 80),
       distance: `${Math.floor(Math.random() * 15 + 2)} km`,
       availableBeds: "General, ICU"
     }));
@@ -62,7 +62,7 @@ class ReferralService {
     if (!referral) {
       throw new ApiError(404, "Referral not found");
     }
-    
+
     if (referral.status !== REFERRAL_STATUS.PENDING && referral.status !== REFERRAL_STATUS.RECOMMENDATION_READY) {
       throw new ApiError(400, "Cannot send this referral from its current state");
     }
@@ -70,7 +70,7 @@ class ReferralService {
     // AI Integration Validation
     const patient = await patientRepository.findById(referral.patientId, hospitalId);
     if (!patient) throw new ApiError(404, "Patient associated with referral not found");
-    
+
     if (!referral.severity) throw new ApiError(400, "Referral severity is missing");
 
     // Allow referral even if AI hospital recommendation wasn't explicitly saved
@@ -91,13 +91,13 @@ class ReferralService {
       hospitalScore: rec.recommendationScore || 85, // Use recommendation score or default
       distanceKm: rec.distanceKm || 10,
       icuAvailable: rec.icuBedsAvailable > 0,
-      ambulanceAvailable: !!availableAmbulance, 
-      waitingTimeMinutes, 
+      ambulanceAvailable: !!availableAmbulance,
+      waitingTimeMinutes,
     });
 
     if (
-      !aiPriority.success || 
-      !aiPriority.priority || 
+      !aiPriority.success ||
+      !aiPriority.priority ||
       typeof aiPriority.estimated_transfer_time !== 'string' ||
       !Array.isArray(aiPriority.reason) ||
       typeof aiPriority.recommendation !== 'string'
@@ -152,7 +152,7 @@ class ReferralService {
       throw new ApiError(404, "Referral not found");
     }
 
-    
+
     const cancelableStatuses = [REFERRAL_STATUS.PENDING, REFERRAL_STATUS.RECOMMENDATION_READY, REFERRAL_STATUS.SENT_TO_HOSPITAL];
     if (!cancelableStatuses.includes(referral.status)) {
       throw new ApiError(400, "Cannot cancel referral at this stage");
@@ -168,10 +168,10 @@ class ReferralService {
     if (referral.assignedAmbulance) {
       const User = (await import("../models/User.model.js")).default;
       await User.findByIdAndUpdate(
-        referral.assignedAmbulance._id || referral.assignedAmbulance, 
+        referral.assignedAmbulance._id || referral.assignedAmbulance,
         { isAvailable: true }
       );
-      updateData.ambulanceStatus = "AVAILABLE"; 
+      updateData.ambulanceStatus = "AVAILABLE";
     }
 
     const updatedReferral = await referralRepository.updateStatus(referralId, updateData);
@@ -225,10 +225,10 @@ class ReferralService {
     if (referral.assignedAmbulance) {
       const User = (await import("../models/User.model.js")).default;
       await User.findByIdAndUpdate(
-        referral.assignedAmbulance._id || referral.assignedAmbulance, 
+        referral.assignedAmbulance._id || referral.assignedAmbulance,
         { isAvailable: true }
       );
-      updateData.ambulanceStatus = "AVAILABLE"; 
+      updateData.ambulanceStatus = "AVAILABLE";
     }
 
     const updatedReferral = await referralRepository.updateStatus(referralId, updateData);

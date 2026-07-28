@@ -13,6 +13,12 @@ class DoctorController {
     return apiResponse(res, 200, true, result.message, result.data);
   });
 
+  updateDutyStatus = asyncHandler(async (req, res) => {
+    const { onDuty } = req.body;
+    const result = await doctorService.updateDutyStatus(req.user.id, onDuty);
+    return apiResponse(res, 200, true, result.message, result.data);
+  });
+
   createPatient = asyncHandler(async (req, res) => {
     const result = await doctorService.createPatient(req.user.id, req.body);
     return apiResponse(res, 201, true, result.message, result.data);

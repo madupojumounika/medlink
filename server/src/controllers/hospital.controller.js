@@ -22,7 +22,7 @@ class HospitalController {
     const result = await hospitalService.updateResources(req.user.hospitalId, req.body);
     return apiResponse(res, 200, true, result.message, result.data);
   });
-  
+
   createReferral = asyncHandler(async (req, res) => {
     const result = await hospitalService.createReferral(req.user.hospitalId, req.body);
     return apiResponse(res, 201, true, result.message, result.data);
@@ -49,12 +49,24 @@ class HospitalController {
   });
 
   createEmployee = asyncHandler(async (req, res) => {
-    const result = await hospitalService.createEmployee(req.user.hospitalId, req.body);
+    let hospitalId = req.user.hospitalId || req.body.hospitalId;
+    if (!hospitalId && ["system_admin", "super_admin", "admin"].includes(req.user.role)) {
+      const Hospital = (await import("../models/Hospital.model.js")).default;
+      const firstHospital = await Hospital.findOne({});
+      if (firstHospital) hospitalId = firstHospital._id;
+    }
+    const result = await hospitalService.createEmployee(hospitalId, req.body);
     return apiResponse(res, 201, true, result.message, result.data);
   });
 
   getEmployees = asyncHandler(async (req, res) => {
-    const result = await hospitalService.getEmployees(req.user.hospitalId, req.query);
+    let hospitalId = req.user.hospitalId || req.query.hospitalId;
+    if (!hospitalId && ["system_admin", "super_admin", "admin"].includes(req.user.role)) {
+      const Hospital = (await import("../models/Hospital.model.js")).default;
+      const firstHospital = await Hospital.findOne({});
+      if (firstHospital) hospitalId = firstHospital._id;
+    }
+    const result = await hospitalService.getEmployees(hospitalId, req.query);
     return apiResponse(res, 200, true, result.message, result.data, null, result.meta);
   });
 

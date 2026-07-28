@@ -8,8 +8,17 @@ class AuthRepository {
     return users[0];
   }
 
-  async findUserByEmail(email) {
-    return await User.findOne({ email });
+  async findUserByEmail(identifier) {
+    if (!identifier) return null;
+    const cleanId = identifier.trim().toLowerCase();
+    return await User.findOne({
+      $or: [{ email: cleanId }, { username: cleanId }]
+    });
+  }
+
+  async findUserByUsername(username) {
+    if (!username) return null;
+    return await User.findOne({ username: username.trim().toLowerCase() });
   }
 
   async findUserById(id) {

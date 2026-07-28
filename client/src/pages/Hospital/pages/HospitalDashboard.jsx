@@ -1,26 +1,63 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { PageHeader } from '@/components/common/PageHeader';
 import { MetricCard } from '@/components/common/MetricCard';
-import { DataTable } from '@/components/common/DataTable';
 import { StatusBadge } from '@/components/common/StatusBadge';
-import { ChartCard } from '@/components/common/ChartCard';
-import { Activity, Bed, Users, AlertTriangle } from 'lucide-react';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
+import { Activity, Bed, Users, AlertTriangle, ShieldCheck, Clock, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { api } from '@/lib/api';
 import { Loader } from '@/components/common/Loader';
-import { AIHospitalRecommendation } from '../components/AIHospitalRecommendation';
+import { useNavigate } from 'react-router-dom';
 
-const chartData = [
-  { time: '00:00', patients: 12 }, { time: '04:00', patients: 8 },
-  { time: '08:00', patients: 25 }, { time: '12:00', patients: 45 },
-  { time: '16:00', patients: 38 }, { time: '20:00', patients: 30 },
-  { time: '24:00', patients: 18 },
-];
+// Clean, neutral Vercel-style Spotlight Card Component
+const SpotlightCard = ({ children, className = "", onClick }) => {
+  const divRef = useRef(null);
+  const [isFocused, setIsFocused] = useState(false);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+
+  const handleMouseMove = (e) => {
+    if (!divRef.current) return;
+    const rect = divRef.current.getBoundingClientRect();
+    setPosition({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+  };
+
+  return (
+    <motion.div
+      ref={divRef}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={() => setIsFocused(true)}
+      onMouseLeave={() => setIsFocused(false)}
+      onClick={onClick}
+      whileHover={{ scale: onClick ? 0.998 : 1 }}
+      className={`relative overflow-hidden rounded-xl border border-border bg-card/60 hover:border-border/80 hover:bg-card transition-all duration-200 ${onClick ? 'cursor-pointer shadow-sm hover:shadow' : ''
+        } ${className}`}
+    >
+      <div
+        className="pointer-events-none absolute -inset-px transition-opacity duration-300 rounded-xl"
+        style={{
+          opacity: isFocused ? 1 : 0,
+          background: `radial-gradient(350px circle at ${position.x}px ${position.y}px, rgba(120, 120, 120, 0.08), transparent 80%)`,
+        }}
+      />
+      <div className="relative z-10">{children}</div>
+    </motion.div>
+  );
+};
+
+// Helper for formatted time
+const formatTime = (dateString) => {
+  if (!dateString) return 'Just now';
+  try {
+    const date = new Date(dateString);
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  } catch (e) {
+    return 'Recently';
+  }
+};
 
 export default function HospitalDashboard() {
   const [stats, setStats] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchStats();
@@ -37,19 +74,14 @@ export default function HospitalDashboard() {
     }
   };
 
-  const columns = [
-    { header: 'ID', accessorKey: '_id', cell: (row) => row._id?.slice(-6).toUpperCase() },
-    { header: 'Patient', cell: (row) => row.patientId?.name || 'Unknown' },
-    { header: 'Severity', accessorKey: 'priority', cell: (row) => <StatusBadge status={row.priority === 'Critical' ? 'critical' : row.priority === 'High' ? 'pending' : 'stable'}>{row.priority}</StatusBadge> },
-    { header: 'From', cell: (row) => row.fromHospitalId?.name || 'Unknown' },
-  ];
-
   if (isLoading) return <div className="flex justify-center p-12"><Loader size="lg" /></div>;
+
+  const activeEmergencies = stats?.activeEmergencies || [];
 
   return (
     <div className="space-y-6">
       <PageHeader title="Hospital Command Center" description="Real-time overview of hospital capacity and incoming emergencies." />
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <MetricCard title="Available ICU Beds" value={stats?.availableICUBeds || 0} description={`Out of ${stats?.totalICUBeds || 0} total`} icon={Bed} trend={{ isPositive: true, value: 0 }} />
         <MetricCard title="Incoming Referrals" value={stats?.incomingReferralsCount || 0} description="Awaiting review" icon={AlertTriangle} trend={{ isPositive: true, value: 0 }} />
@@ -57,42 +89,117 @@ export default function HospitalDashboard() {
         <MetricCard title="Avg Triage Time" value={stats?.avgTriageTime || "N/A"} description="Past 24 hours" icon={Activity} trend={{ isPositive: true, value: 0 }} />
       </div>
 
-      {/* AI Hospital Recommendation Widget */}
-      <AIHospitalRecommendation />
+      {/* Clean, Professional Hackathon-Ready Incoming Emergencies Section */}
+      <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, duration: 0.25 }}>
+        <div className="bg-card text-card-foreground rounded-2xl border border-border shadow-sm p-6">
+          {/* Section Header Bar */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 mb-5 border-b border-border/60">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-xl bg-muted/60 border border-border text-foreground flex items-center justify-center">
+                <AlertTriangle className="w-4 h-4 text-amber-500" />
+              </div>
+              <div>
+                <h3 className="text-base font-semibold text-foreground tracking-tight flex items-center gap-2">
+                  Incoming Emergencies
+                </h3>
+                <p className="text-xs text-muted-foreground">
+                  Live telemetry of high-acuity patient arrivals and trauma transfers
+                </p>
+              </div>
+            </div>
 
-      <div className="grid lg:grid-cols-3 gap-6">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="lg:col-span-2">
-          <ChartCard title="Patient Influx Trend" description="Emergency admissions over the last 24 hours">
-            <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-              <defs>
-                <linearGradient id="colorPatients" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.3}/>
-                  <stop offset="95%" stopColor="#06b6d4" stopOpacity={0}/>
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
-              <XAxis dataKey="time" stroke="#64748b" fontSize={12} tickLine={false} axisLine={false} />
-              <YAxis stroke="#64748b" fontSize={12} tickLine={false} axisLine={false} />
-              <Tooltip 
-                contentStyle={{ backgroundColor: '#0f172a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }}
-                itemStyle={{ color: '#fff' }}
-              />
-              <Area type="monotone" dataKey="patients" stroke="#06b6d4" strokeWidth={2} fillOpacity={1} fill="url(#colorPatients)" />
-            </AreaChart>
-          </ChartCard>
-        </motion.div>
-        
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="lg:col-span-1 flex flex-col gap-6">
-          <div className="bg-slate-900/50 backdrop-blur-sm border border-white/5 rounded-2xl p-6 flex-1">
-            <h3 className="text-lg font-semibold text-white mb-4">Incoming Emergencies</h3>
-            {stats?.activeEmergencies?.length > 0 ? (
-              <DataTable columns={columns} data={stats.activeEmergencies} searchable={false} />
-            ) : (
-              <div className="text-center text-slate-400 py-8">No incoming emergencies.</div>
-            )}
+            {/* Status Pill Badge */}
+            <div className="self-start sm:self-center">
+              {activeEmergencies.length > 0 ? (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">
+                  <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
+                  {activeEmergencies.length} {activeEmergencies.length === 1 ? 'case active' : 'cases active'}
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-muted/80 text-muted-foreground border border-border">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                  All clear (0 active)
+                </span>
+              )}
+            </div>
           </div>
-        </motion.div>
-      </div>
+
+          {/* Content Area */}
+          {activeEmergencies.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {activeEmergencies.map((row) => {
+                const patientName = row.patientId?.name || 'Unknown Patient';
+                const originHospital = row.fromHospitalId?.name || 'External Facility';
+                const priority = row.priority || 'Medium';
+                const diagnosis = row.patientId?.diagnosis || row.diagnosis || 'Emergency triage in progress';
+
+                return (
+                  <SpotlightCard
+                    key={row._id}
+                    onClick={() => navigate('/dashboard/hospital/referrals')}
+                    className="p-4 flex flex-col justify-between"
+                  >
+                    <div>
+                      <div className="flex items-start justify-between gap-3 mb-3">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-8 h-8 rounded-lg bg-muted border border-border/80 flex items-center justify-center font-semibold text-xs text-foreground shrink-0">
+                            {patientName.slice(0, 2).toUpperCase()}
+                          </div>
+                          <div className="min-w-0">
+                            <h4 className="font-semibold text-sm text-foreground truncate">
+                              {patientName}
+                            </h4>
+                            <p className="text-[11px] font-mono text-muted-foreground">
+                              ID: #{row._id?.slice(-6).toUpperCase()}
+                            </p>
+                          </div>
+                        </div>
+
+                        <StatusBadge status={priority === 'Critical' ? 'critical' : priority === 'High' ? 'pending' : 'stable'}>
+                          {priority}
+                        </StatusBadge>
+                      </div>
+
+                      <div className="py-2.5 px-3 rounded-lg bg-muted/30 border border-border/40 space-y-1 mb-3">
+                        <p className="text-xs text-muted-foreground truncate">
+                          <span className="font-medium text-foreground">Diagnosis: </span>
+                          {diagnosis}
+                        </p>
+                        <p className="text-xs text-muted-foreground truncate">
+                          <span className="font-medium text-foreground">Origin: </span>
+                          {originHospital}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between text-xs text-muted-foreground pt-2 border-t border-border/40">
+                      <span className="flex items-center gap-1 text-[11px]">
+                        <Clock className="w-3 h-3 text-muted-foreground/70" />
+                        {formatTime(row.sentAt || row.createdAt || row.updatedAt)}
+                      </span>
+                      <span className="font-medium text-primary hover:underline inline-flex items-center gap-0.5">
+                        Review case <ChevronRight className="w-3 h-3" />
+                      </span>
+                    </div>
+                  </SpotlightCard>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="py-12 px-4 text-center rounded-xl border border-dashed border-border bg-muted/20 my-2">
+              <div className="w-10 h-10 rounded-xl bg-muted border border-border flex items-center justify-center text-muted-foreground mx-auto mb-3">
+                <ShieldCheck className="w-5 h-5 text-emerald-500" />
+              </div>
+              <h4 className="text-sm font-semibold text-foreground">
+                No active incoming emergencies
+              </h4>
+              <p className="text-xs text-muted-foreground max-w-sm mx-auto mt-1 leading-relaxed">
+                When emergency departments or ambulances dispatch high-acuity transfers to this hospital, they will appear here in real time.
+              </p>
+            </div>
+          )}
+        </div>
+      </motion.div>
     </div>
   );
 }

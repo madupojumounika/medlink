@@ -29,7 +29,7 @@ class HospitalService {
   async getResources(hospitalId) {
     const hospital = await hospitalRepository.getHospitalById(hospitalId);
     if (!hospital) throw new ApiError(404, "Hospital not found");
-    
+
     const resources = await hospitalRepository.getResources(hospital._id);
     return { message: "Hospital resources retrieved successfully", data: resources || {} };
   }
@@ -64,7 +64,7 @@ class HospitalService {
       }, session);
 
       await patientRepository.updatePatient(referralData.patientId, { needsReferral: false });
-      
+
       await session.commitTransaction();
       return { message: "Referral created successfully", data: referral };
     } catch (error) {
@@ -95,8 +95,8 @@ class HospitalService {
     }
 
     const { data, total } = await hospitalRepository.getReferrals(query, options);
-    return { 
-      message: "Referrals retrieved successfully", 
+    return {
+      message: "Referrals retrieved successfully",
       data,
       meta: { total, page: options.page, limit: options.limit }
     };
@@ -109,10 +109,10 @@ class HospitalService {
     const referral = await hospitalRepository.getReferralById(referralId);
     if (!referral) throw new ApiError(404, "Referral not found");
 
-    const isAuthorized = 
+    const isAuthorized =
       (referral.fromHospitalId?._id || referral.fromHospitalId).toString() === hospital._id.toString() ||
       (referral.toHospitalId?._id || referral.toHospitalId)?.toString() === hospital._id.toString();
-      
+
     if (!isAuthorized) {
       throw new ApiError(403, "Not authorized to access this referral");
     }
@@ -183,30 +183,53 @@ class HospitalService {
     const { authRepository } = await import("../repositories/auth.repository.js");
     const { createProfile } = await import("../utils/profile.factory.js");
     const { hashPassword } = await import("../utils/password.js");
-    
+
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
-      const existingUser = await authRepository.findUserByEmail(employeeData.email);
-      if (existingUser) {
-        throw new ApiError(400, "Email already in use");
+      if (employeeData.email && employeeData.email.trim() !== "") {
+        const existingUser = await authRepository.findUserByEmail(employeeData.email);
+        if (existingUser) {
+          throw new ApiError(400, "Email already in use");
+        }
+      }
+
+      let username = employeeData.username;
+      if (employeeData.role === "doctor" && !username) {
+        const cleanName = employeeData.fullName ? employeeData.fullName.trim().split(" ")[0].toLowerCase().replace(/[^a-z0-9]/g, "") || "dr" : "dr";
+        let isUnique = false;
+        let attempts = 0;
+        while (!isUnique && attempts < 10) {
+          const randNum = Math.floor(100 + Math.random() * 900);
+          const candidate = `${cleanName}${randNum}`;
+          const existing = await authRepository.findUserByUsername(candidate);
+          if (!existing) {
+            username = candidate;
+            isUnique = true;
+          }
+          attempts++;
+        }
+        if (!username) {
+          username = `${cleanName}${Date.now().toString().slice(-4)}`;
+        }
       }
 
       const hashedPassword = await hashPassword(employeeData.password);
 
       const userForDB = {
         fullName: employeeData.fullName,
-        email: employeeData.email,
+        email: employeeData.email && employeeData.email.trim() !== "" ? employeeData.email.trim().toLowerCase() : undefined,
+        username: username,
         password: hashedPassword,
         role: employeeData.role, // e.g. "doctor", "referral_coordinator"
         hospitalId: hospitalId
       };
 
       const createdUser = await authRepository.createUser(userForDB, session);
-      await createProfile(createdUser, session);
+      await createProfile(createdUser, session, employeeData);
 
       await session.commitTransaction();
-      
+
       const { password, ...userWithoutPassword } = createdUser.toObject ? createdUser.toObject() : createdUser;
       return { message: "Employee created successfully", data: userWithoutPassword };
     } catch (error) {
@@ -230,8 +253,8 @@ class HospitalService {
     }
 
     const { data, total } = await hospitalRepository.getEmployees(query, options);
-    return { 
-      message: "Employees retrieved successfully", 
+    return {
+      message: "Employees retrieved successfully",
       data,
       meta: { total, page: options.page, limit: options.limit }
     };
@@ -260,7 +283,7 @@ class HospitalService {
   async recommendHospital(hospitalId, patientId, specialty, severity) {
     const hospital = await hospitalRepository.getHospitalById(hospitalId);
     if (!hospital) throw new ApiError(404, "Hospital not found");
-    
+
     if (hospital.latitude == null || hospital.longitude == null) {
       throw new ApiError(400, "Hospital location (latitude/longitude) is not configured");
     }

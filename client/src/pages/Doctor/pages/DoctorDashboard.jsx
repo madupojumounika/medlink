@@ -15,6 +15,8 @@ export default function DoctorDashboard() {
   const navigate = useNavigate();
   const [patients, setPatients] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isOnDuty, setIsOnDuty] = useState(true);
+  const [isStatusUpdating, setIsStatusUpdating] = useState(false);
 
   useEffect(() => {
     fetchDashboardData();
@@ -22,12 +24,31 @@ export default function DoctorDashboard() {
 
   const fetchDashboardData = async () => {
     try {
-      const res = await api.get('/v1/patients');
-      setPatients(res.data.data);
+      const [patientsRes, profileRes] = await Promise.all([
+        api.get('/v1/patients').catch(() => ({ data: { data: [] } })),
+        api.get('/v1/doctors/profile').catch(() => ({ data: { data: null } }))
+      ]);
+      setPatients(patientsRes.data.data || []);
+      if (profileRes.data.data) {
+        setIsOnDuty(profileRes.data.data.onDuty ?? profileRes.data.data.availability ?? true);
+      }
     } catch (error) {
       alert('Failed to load dashboard data');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleToggleDuty = async () => {
+    try {
+      setIsStatusUpdating(true);
+      const nextStatus = !isOnDuty;
+      await api.patch('/v1/doctors/duty-status', { onDuty: nextStatus });
+      setIsOnDuty(nextStatus);
+    } catch (error) {
+      alert('Failed to update duty status. Please try again.');
+    } finally {
+      setIsStatusUpdating(false);
     }
   };
 
@@ -67,8 +88,47 @@ export default function DoctorDashboard() {
 
   return (
     <div className="space-y-6 pb-12">
-      <PageHeader title="Doctor Dashboard" description="Overview of your active patients and clinical tasks." />
-      
+      <PageHeader title="Doctor Dashboard" description="Overview of your active patients and clinical tasks.">
+        <div className="flex items-center gap-3 bg-card border border-border px-4 py-2 rounded-xl shadow-sm">
+          <div className="flex items-center gap-2 text-sm font-medium">
+            <span className={`h-2.5 w-2.5 rounded-full ${isOnDuty ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'}`} />
+            <span className="text-foreground font-semibold min-w-[65px]">
+              {isStatusUpdating ? 'Saving...' : isOnDuty ? 'On Duty' : 'Off Duty'}
+            </span>
+          </div>
+          <div className="h-5 w-px bg-border mx-0.5" />
+          <button
+            type="button"
+            role="switch"
+            aria-checked={isOnDuty}
+            onClick={handleToggleDuty}
+            disabled={isStatusUpdating}
+            title={isOnDuty ? "Click to switch Off Duty" : "Click to switch On Duty"}
+            className={`relative inline-flex h-8 w-16 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 ${
+              isOnDuty ? 'bg-emerald-600' : 'bg-slate-300 dark:bg-slate-700'
+            }`}
+          >
+            <span className={`absolute text-[10px] font-bold tracking-wider uppercase transition-opacity duration-200 ${
+              isOnDuty ? 'left-2.5 text-white opacity-100' : 'left-2.5 text-white opacity-0'
+            }`}>
+              ON
+            </span>
+            <span className={`absolute text-[10px] font-bold tracking-wider uppercase transition-opacity duration-200 ${
+              !isOnDuty ? 'right-2 text-slate-600 dark:text-slate-300 opacity-100' : 'right-2 text-slate-600 opacity-0'
+            }`}>
+              OFF
+            </span>
+            <span
+              className={`pointer-events-none z-10 flex h-7 w-7 items-center justify-center rounded-full bg-white shadow-md ring-0 transition-transform duration-300 ease-in-out ${
+                isOnDuty ? 'translate-x-8 text-emerald-600' : 'translate-x-0 text-slate-400'
+              }`}
+            >
+              <Activity className="w-4 h-4" />
+            </span>
+          </button>
+        </div>
+      </PageHeader>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <MetricCard title="Total Active Patients" value={activePatients.length} description="Currently under care" icon={Users} trend={{ isPositive: true, value: 5 }} />
         <MetricCard title="Critical Patients" value={criticalPatients} description="Requires immediate attention" icon={AlertTriangle} />

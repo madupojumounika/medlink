@@ -14,7 +14,7 @@ import { authorize } from "../middleware/authorize.js";
 const router = Router();
 
 // Protect all hospital routes
-router.use(authenticate, authorize("hospital_admin"));
+router.use(authenticate, authorize("hospital_admin", "system_admin", "super_admin", "admin"));
 
 // Profile
 router.get("/profile", hospitalController.getProfile);

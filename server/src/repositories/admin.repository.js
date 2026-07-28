@@ -1,4 +1,5 @@
 import User from '../models/User.model.js';
+import DoctorProfile from '../models/DoctorProfile.model.js';
 import Hospital from '../models/Hospital.model.js';
 import Patient from '../models/Patient.model.js';
 import Referral from '../models/Referral.model.js';
@@ -80,16 +81,43 @@ class AdminRepository {
     throw new Error('Method not implemented: deleteUser');
   }
 
-  async getDoctors(filters, pagination) {
-    throw new Error('Method not implemented: getDoctors');
+  async getDoctors(filters = {}, pagination = {}) {
+    const { sort = { createdAt: -1 }, skip = 0, limit = 20 } = pagination;
+    const query = { role: 'doctor', ...filters };
+    const users = await User.find(query).select('-password').sort(sort).skip(skip).limit(limit).lean();
+    const data = await Promise.all(users.map(async (u) => {
+      const profile = await DoctorProfile.findOne({ userId: u._id }).populate('hospitalId', 'hospitalName email phone').lean();
+      return {
+        id: `DR-${u._id.toString().slice(-4).toUpperCase()}`,
+        _id: u._id,
+        name: u.fullName,
+        username: u.username || u.email || 'N/A',
+        email: u.email || u.username || 'N/A',
+        specialization: profile?.department || profile?.specialization || profile?.qualifications?.join(', ') || 'General Practitioner',
+        hospital: profile?.hospitalId?.hospitalName || 'Unassigned',
+        license: profile?.licenseNumber || 'MD-N/A',
+        status: u.isActive ? 'Verified' : 'Pending Review',
+        isActive: u.isActive,
+        onDuty: profile?.onDuty ?? profile?.availability ?? u.onDuty ?? u.isAvailable ?? true,
+        availability: profile?.availability ?? profile?.onDuty ?? u.isAvailable ?? u.onDuty ?? true,
+      };
+    }));
+    const total = await User.countDocuments(query);
+    return { data, total };
   }
 
   async getDoctorById(id) {
-    throw new Error('Method not implemented: getDoctorById');
+    const u = await User.findById(id).select('-password').lean();
+    if (!u) return null;
+    const profile = await DoctorProfile.findOne({ userId: u._id }).populate('hospitalId', 'hospitalName email phone').lean();
+    return { ...u, profile };
   }
 
   async updateDoctor(id, updateData) {
-    throw new Error('Method not implemented: updateDoctor');
+    if (updateData.onDuty !== undefined || updateData.isAvailable !== undefined || updateData.isActive !== undefined) {
+      await User.findByIdAndUpdate(id, updateData);
+    }
+    return await DoctorProfile.findOneAndUpdate({ userId: id }, updateData, { new: true }).lean();
   }
 
   async getHospitals(filters, pagination) {
