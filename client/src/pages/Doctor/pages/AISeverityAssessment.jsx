@@ -101,7 +101,7 @@ export default function AISeverityAssessment({ patient, onAssessmentComplete }) 
               <motion.div key="result" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="w-full bg-card border border-rose-200 dark:border-rose-500/30 rounded-3xl p-8 shadow-sm text-center relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-rose-500/10 rounded-full blur-[40px]"></div>
                 <Activity className="w-12 h-12 text-rose-500 mx-auto mb-4" />
-                <h3 className="text-6xl font-black text-rose-500 mb-2">{Math.round(result.confidence * 100)}%</h3>
+                <h3 className="text-6xl font-black text-rose-500 mb-2">{Math.round(result.confidence)}%</h3>
                 <div className="text-rose-500 font-bold tracking-widest uppercase mb-4">{result.severity} RISK</div>
                 <p className="text-muted-foreground text-sm leading-relaxed mb-6 bg-muted/50 p-4 rounded-lg border border-border">{result.recommendation}</p>
                 <div className="text-xs text-muted-foreground mt-4">Risk Score: {result.riskScore?.toFixed(2)}</div>
