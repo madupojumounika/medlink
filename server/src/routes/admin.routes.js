@@ -13,7 +13,7 @@ const router = Router();
 
 // Protect all admin routes
 router.use(authenticate);
-router.use(authorize('admin'));
+router.use(authorize('admin', 'system_admin', 'super_admin', 'hospital_admin'));
 
 // Dashboard
 router.get('/dashboard', adminController.getDashboard);

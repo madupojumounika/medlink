@@ -10,7 +10,7 @@ import { ApiError } from "./ApiError.js";
  * @param {Object} user - The newly created User object.
  * @param {Object} session - Mongoose session for transaction.
  */
-export const createProfile = async (user, session) => {
+export const createProfile = async (user, session, extraData = {}) => {
   if (!user || !user.role) {
     throw new ApiError(500, "Cannot create profile: Invalid user data.");
   }
@@ -27,8 +27,10 @@ export const createProfile = async (user, session) => {
     case "doctor":
       return await DoctorProfile.create([{
         ...baseProfileData,
-        // Provide empty string defaults for required fields to be updated later
-        licenseNumber: `LIC-${user._id}`
+        phone: extraData.phone || user.phone || "",
+        department: extraData.specialist || extraData.specialization || extraData.department || "General Medicine",
+        qualifications: extraData.qualifications ? [extraData.qualifications] : ["MBBS"],
+        licenseNumber: extraData.licenseNumber || `LIC-${user._id}`
       }], { session });
       
     case "referral_coordinator":

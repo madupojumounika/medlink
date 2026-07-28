@@ -12,7 +12,7 @@ import { Checkbox } from '@/components/common/Checkbox';
 import { useAuth } from '@/hooks/useAuth';
 
 const loginSchema = z.object({
-  email: z.string().email('Please enter a valid email address'),
+  email: z.string().min(1, 'Email or User ID is required'),
   password: z.string().min(1, 'Password is required'),
   rememberMe: z.boolean().optional(),
 });
@@ -29,7 +29,7 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [selectedRole, setSelectedRole] = useState(null);
-  
+
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuth();
@@ -55,7 +55,7 @@ export default function Login() {
 
     try {
       const user = await login(data.email, data.password);
-      
+
       // Auto-redirect based on role
       let dashboardPath = `/dashboard/${user.role}`;
       if (user.role === 'hospital_admin') dashboardPath = '/dashboard/hospital';
@@ -64,7 +64,7 @@ export default function Login() {
 
       const redirectPath = location.state?.from?.pathname || dashboardPath;
       navigate(redirectPath, { replace: true });
-      
+
     } catch (err) {
       setErrorMsg(err.message || 'Invalid email or password');
     } finally {
@@ -122,13 +122,13 @@ export default function Login() {
         )}
 
         <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
+          <Label htmlFor="email">{selectedRole?.id === 'doctor' ? 'User ID or Email' : 'Email'}</Label>
           <div className="relative">
             <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             <Input
               id="email"
-              type="email"
-              placeholder="name@example.com"
+              type={selectedRole?.id === 'doctor' ? 'text' : 'email'}
+              placeholder={selectedRole?.id === 'doctor' ? 'e.g. sarah492 or name@example.com' : 'name@example.com'}
               className="pl-9"
               disabled={isLoading}
               {...register('email')}

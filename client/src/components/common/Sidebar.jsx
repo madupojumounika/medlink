@@ -10,9 +10,7 @@ const hospitalNavigation = [
   { name: 'ICU & Beds', href: '/dashboard/hospital/icu', icon: Bed },
   { name: 'Resources', href: '/dashboard/hospital/resources', icon: Database },
   { name: 'Staff Management', href: '/dashboard/hospital/doctors', icon: Stethoscope },
-  { name: 'Departments', href: '/dashboard/hospital/departments', icon: Building },
   { name: 'Incoming Requests', href: '/dashboard/hospital/referrals', icon: FileText },
-  { name: 'Emergency Queue', href: '/dashboard/hospital/patients', icon: AlertTriangle },
   { name: 'Analytics', href: '/dashboard/analytics', icon: Activity },
   { name: 'Settings', href: '/dashboard/hospital/settings', icon: Settings },
 ]
@@ -82,7 +80,7 @@ export function Sidebar() {
   const navigation = getNavigation();
 
   return (
-    <div className="hidden border-r border-border bg-card md:block w-64 flex-shrink-0 min-h-screen transition-all duration-300">
+    <div className="hidden border-r border-border bg-card md:block w-64 flex-shrink-0 sticky top-0 h-screen overflow-hidden transition-all duration-300">
       <div className="flex h-full max-h-screen flex-col gap-2">
         <div className="flex h-14 items-center border-b border-border px-4 lg:h-[60px] lg:px-6 bg-card">
           <Link to="/" className="flex items-center gap-2 font-semibold">

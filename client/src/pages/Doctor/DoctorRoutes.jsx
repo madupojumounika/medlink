@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from 'react';
+ import React, { Suspense, lazy } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { Loader } from '@/components/common/Loader';
 import { PageTransition } from '@/components/common/PageTransition';

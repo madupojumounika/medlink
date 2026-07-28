@@ -27,10 +27,16 @@ const doctorProfileSchema = new mongoose.Schema(
     qualifications: {
       type: [String],
     },
+    registrationNumber: {
+      type: String,
+      sparse: true,
+      trim: true,
+    },
     licenseNumber: {
       type: String,
       required: true,
       unique: true,
+      sparse: true,
       trim: true,
     },
     opTimings: {

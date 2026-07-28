@@ -67,8 +67,8 @@ export class DoctorRepository {
     const { sort, skip, limit } = options;
     const data = await Referral.find({ ...query, isActive: true })
       .populate("patientId", "name age gender")
-      .populate("fromHospitalId", "name email")
-      .populate("toHospitalId", "name email")
+      .populate("fromHospitalId", "hospitalName name email")
+      .populate("toHospitalId", "hospitalName name email")
       .sort(sort)
       .skip(skip)
       .limit(limit)
@@ -81,8 +81,8 @@ export class DoctorRepository {
   async getReferralById(referralId) {
     return await Referral.findOne({ _id: referralId, isActive: true })
       .populate("patientId", "name age gender bloodGroup allergies existingConditions phone")
-      .populate("fromHospitalId", "name email phone")
-      .populate("toHospitalId", "name email phone")
+      .populate("fromHospitalId", "hospitalName name email phone")
+      .populate("toHospitalId", "hospitalName name email phone")
       .lean();
   }
 }

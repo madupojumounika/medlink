@@ -26,7 +26,7 @@ class ReferralRepository {
     return await Referral.find(query)
       .populate("patientId")
       .populate("doctorId", "fullName")
-      .populate("fromHospitalId", "name")
+      .populate("fromHospitalId", "hospitalName name")
       .sort({ sentAt: -1 });
   }
 
@@ -41,7 +41,7 @@ class ReferralRepository {
     return await Referral.find(query)
       .populate("patientId")
       .populate("doctorId", "fullName")
-      .populate("toHospitalId", "name")
+      .populate("toHospitalId", "hospitalName name")
       .sort({ updatedAt: -1 });
   }
 
@@ -53,8 +53,8 @@ class ReferralRepository {
     })
       .populate("patientId")
       .populate("doctorId", "fullName")
-      .populate("fromHospitalId", "name")
-      .populate("toHospitalId", "name")
+      .populate("fromHospitalId", "hospitalName name")
+      .populate("toHospitalId", "hospitalName name")
       .populate("assignedAmbulance", "fullName email");
   }
 

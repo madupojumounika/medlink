@@ -62,15 +62,15 @@ class AuthService {
     }
   }
 
-  async login(email, password) {
-    const user = await authRepository.findUserByEmail(email);
+  async login(identifier, password) {
+    const user = await authRepository.findUserByEmail(identifier);
     if (!user) {
-      throw new ApiError(401, "Invalid email or password");
+      throw new ApiError(401, "Invalid User ID/email or password");
     }
 
     const isMatch = await comparePassword(password, user.password);
     if (!isMatch) {
-      throw new ApiError(401, "Invalid email or password");
+      throw new ApiError(401, "Invalid User ID/email or password");
     }
 
     if (!user.isActive) {
