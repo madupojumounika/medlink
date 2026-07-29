@@ -191,7 +191,7 @@ class ReferralService {
   async acceptReferral(hospitalId, userId, referralId, remarks) {
     const referral = await referralRepository.getById(referralId, hospitalId); // getById allows fromHospital or toHospital
     if (!referral) throw new ApiError(404, "Referral not found");
-    if (String(referral.toHospitalId._id || referral.toHospitalId) !== String(hospitalId)) {
+    if (String(referral.toHospitalId?._id || referral.toHospitalId) !== String(hospitalId)) {
       throw new ApiError(403, "Not authorized to accept this referral");
     }
     if (referral.status !== REFERRAL_STATUS.SENT_TO_HOSPITAL) {
@@ -212,7 +212,7 @@ class ReferralService {
   async rejectReferral(hospitalId, userId, referralId, remarks) {
     const referral = await referralRepository.getById(referralId, hospitalId);
     if (!referral) throw new ApiError(404, "Referral not found");
-    if (String(referral.toHospitalId._id || referral.toHospitalId) !== String(hospitalId)) {
+    if (String(referral.toHospitalId?._id || referral.toHospitalId) !== String(hospitalId)) {
       throw new ApiError(403, "Not authorized to reject this referral");
     }
     if (referral.status !== REFERRAL_STATUS.SENT_TO_HOSPITAL) {

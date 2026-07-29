@@ -39,14 +39,14 @@ class ReferralController {
 
   async acceptReferral(req, res) {
     const { id } = req.params;
-    const { remarks } = req.body;
+    const remarks = req.body?.remarks;
     const response = await referralService.acceptReferral(req.user.hospitalId, req.user.id, id, remarks);
     res.status(200).json(response);
   }
 
   async rejectReferral(req, res) {
     const { id } = req.params;
-    const { remarks } = req.body;
+    const remarks = req.body?.remarks;
     const response = await referralService.rejectReferral(req.user.hospitalId, req.user.id, id, remarks);
     res.status(200).json(response);
   }
