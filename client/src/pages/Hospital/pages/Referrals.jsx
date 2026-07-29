@@ -73,15 +73,16 @@ export default function Referrals() {
   const fetchQueue = async (tab) => {
     setIsLoading(true);
     try {
-      const endpoint = tab === 'incoming_history' ? '/referrals/incoming?status=history' : '/referrals/incoming';
+      const endpoint = tab === 'incoming_history' ? '/v1/referrals/incoming?status=history' : '/v1/referrals/incoming';
       const res = await api.get(endpoint);
       const data = res.data?.data || [];
       setIncomingQueue(data);
-      if (data.length > 0 && !selectedReferral) {
-        setSelectedReferral(data[0]);
-      } else if (data.length === 0) {
-        setSelectedReferral(null);
-      }
+      
+      setSelectedReferral(current => {
+        if (data.length === 0) return null;
+        const stillExists = data.find(r => r._id === current?._id);
+        return stillExists ? current : data[0];
+      });
     } catch (err) {
       console.error('Failed to load incoming requests', err);
     } finally {
@@ -92,10 +93,12 @@ export default function Referrals() {
   const handleAction = async (referralId, action) => {
     setIsProcessing(true);
     try {
-      await api.post(`/referrals/${referralId}/${action}`);
+      await api.post(`/v1/referrals/${referralId}/${action}`);
+      alert(`Referral ${action}ed successfully`);
       await fetchQueue(activeTab);
     } catch (err) {
       console.error(`Failed to ${action} referral`, err);
+      alert(err?.response?.data?.message || `Failed to ${action} referral`);
     } finally {
       setIsProcessing(false);
     }
@@ -189,7 +192,7 @@ export default function Referrals() {
                 {incomingQueue.map((ref) => {
                   const isSelected = selectedReferral?._id === ref._id;
                   const patientName = ref.patientId?.name || 'Unknown Patient';
-                  const originHospital = ref.fromHospitalId?.name || 'External Facility';
+                  const originHospital = ref.fromHospitalId?.hospitalName || ref.fromHospitalId?.name || 'External Facility';
                   const diagnosis = ref.patientId?.diagnosis || ref.diagnosis || 'Evaluation pending';
                   const priority = ref.priority || 'Medium';
 
@@ -291,7 +294,7 @@ export default function Referrals() {
                         <span>•</span>
                         <span className="flex items-center gap-1">
                           <Building className="w-3.5 h-3.5 text-muted-foreground" />
-                          From: {selectedReferral.fromHospitalId?.name || 'External Hospital'}
+                          From: {selectedReferral.fromHospitalId?.hospitalName || selectedReferral.fromHospitalId?.name || 'External Hospital'}
                         </span>
                       </div>
                     </div>
@@ -334,6 +337,31 @@ export default function Referrals() {
                     </p>
                   </div>
                 </div>
+
+                {selectedReferral.patientId?.requiredResources && Object.values(selectedReferral.patientId.requiredResources).some(v => v === true) && (
+                  <div className="bg-muted/30 p-4 rounded-xl border border-border/50 space-y-3">
+                    <h4 className="text-sm font-semibold text-foreground tracking-tight flex items-center gap-2">
+                      <Activity className="w-4 h-4 text-emerald-500" /> Requested Resources
+                    </h4>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedReferral.patientId.requiredResources.needsICU && (
+                        <span className="px-2.5 py-1 bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 rounded-md text-xs font-semibold shadow-sm">ICU Bed</span>
+                      )}
+                      {selectedReferral.patientId.requiredResources.needsVentilator && (
+                        <span className="px-2.5 py-1 bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 rounded-md text-xs font-semibold shadow-sm">Ventilator</span>
+                      )}
+                      {selectedReferral.patientId.requiredResources.needsBlood && (
+                        <span className="px-2.5 py-1 bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20 rounded-md text-xs font-semibold shadow-sm">Blood Required</span>
+                      )}
+                      {selectedReferral.patientId.requiredResources.needsOperationTheatre && (
+                        <span className="px-2.5 py-1 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 rounded-md text-xs font-semibold shadow-sm">Operation Theatre</span>
+                      )}
+                      {selectedReferral.patientId.requiredResources.needsGeneralBed && (
+                        <span className="px-2.5 py-1 bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 rounded-md text-xs font-semibold shadow-sm">General Bed</span>
+                      )}
+                    </div>
+                  </div>
+                )}
 
                 {/* Hospital Readiness & Capacity Check Widget (Clean Neutral Vercel Style) */}
                 <div className="rounded-xl border border-border bg-muted/20 p-5 space-y-4">

@@ -38,8 +38,8 @@ class HospitalRepository {
   async getReferrals(query, options) {
     const { sort, skip, limit } = options;
     const data = await Referral.find({ ...query, isActive: true })
-      .populate("patientId", "name age gender")
-      .populate("doctorId", "specialization")
+      .populate("patientId", "name age gender requiredResources diagnosis notes medicalHistory")
+      .populate("doctorId", "fullName specialization")
       .populate("fromHospitalId", "hospitalName")
       .populate("toHospitalId", "hospitalName")
       .sort(sort)

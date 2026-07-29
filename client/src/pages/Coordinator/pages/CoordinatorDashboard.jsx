@@ -65,7 +65,14 @@ export default function CoordinatorDashboard() {
 
   const totalPending = internalQueue.length;
   const totalSent = history.filter(r => r.status === 'Sent To Hospital').length;
+  const totalAccepted = history.filter(r => r.status === 'Accepted').length;
+  const totalCompleted = history.filter(r => r.status === 'Completed').length;
   const recentReferrals = internalQueue.slice(0, 5);
+  
+  const recentResponses = history
+    .filter(r => r.status === 'Accepted' || r.status === 'Rejected')
+    .sort((a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt))
+    .slice(0, 5);
 
   return (
     <div className="space-y-6 pb-12">
@@ -74,8 +81,8 @@ export default function CoordinatorDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <MetricCard title="Pending Queue" value={totalPending} description="Awaiting hospital allocation" icon={Clock} trend={{ isPositive: false, value: 2 }} />
         <MetricCard title="Sent Today" value={totalSent} description="Forwarded to external hospitals" icon={Send} />
-        <MetricCard title="Accepted" value="0" description="Awaiting Phase 5" icon={Activity} />
-        <MetricCard title="Completed" value="0" description="Successfully transferred" icon={Users} />
+        <MetricCard title="Accepted" value={totalAccepted} description="Awaiting Phase 5" icon={Activity} />
+        <MetricCard title="Completed" value={totalCompleted} description="Successfully transferred" icon={Users} />
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
@@ -102,6 +109,25 @@ export default function CoordinatorDashboard() {
             <Button onClick={() => navigate('/dashboard/coordinator/history')} className="w-full justify-start gap-3 bg-muted/50 text-foreground hover:bg-muted border-border">
               <FileText className="w-4 h-4" /> View Referral History
             </Button>
+          </div>
+          
+          <h3 className="text-lg font-semibold text-card-foreground mt-8 mb-4">Recent Responses</h3>
+          <div className="space-y-3 max-h-[300px] overflow-y-auto custom-scrollbar">
+            {recentResponses.length > 0 ? (
+               recentResponses.map(res => (
+                 <div key={res._id} className={`p-3 border rounded-xl flex flex-col gap-1 text-sm ${res.status === 'Accepted' ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-rose-500/10 border-rose-500/20'}`}>
+                    <div className="flex justify-between items-center">
+                       <span className="font-semibold text-foreground truncate max-w-[150px]" title={res.toHospitalId?.hospitalName || res.toHospitalId?.name || 'External Hospital'}>
+                         {res.toHospitalId?.hospitalName || res.toHospitalId?.name || 'External Hospital'}
+                       </span>
+                       <span className={`text-xs font-bold ${res.status === 'Accepted' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>{res.status}</span>
+                    </div>
+                    <span className="text-muted-foreground text-xs">Patient: {res.patientId?.name || 'Unknown'}</span>
+                 </div>
+               ))
+            ) : (
+               <div className="text-center p-4 text-xs text-muted-foreground border border-dashed rounded-lg">No recent responses.</div>
+            )}
           </div>
         </motion.div>
       </div>

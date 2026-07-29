@@ -179,7 +179,11 @@ class ReferralService {
   }
   async getIncomingReferrals(hospitalId, query) {
     const filters = {};
-    if (query.status) filters.status = query.status;
+    if (query.status === 'history') {
+      filters.status = { $in: ["Accepted", "Rejected", "Completed"] };
+    } else if (query.status) {
+      filters.status = query.status;
+    }
     const referrals = await referralRepository.getIncomingQueue(hospitalId, filters);
     return { message: "Incoming queue retrieved", data: referrals };
   }

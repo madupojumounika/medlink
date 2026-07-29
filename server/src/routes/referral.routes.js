@@ -12,13 +12,13 @@ router.use(authorize("referral_coordinator", "hospital_admin"));
 
 router.get("/internal", referralController.getInternalQueue);
 router.get("/history", referralController.getHistory);
+router.get('/incoming', (req, res, next) => referralController.getIncomingReferrals(req, res).catch(next));
+router.post('/:id/accept', (req, res, next) => referralController.acceptReferral(req, res).catch(next));
+router.post('/:id/reject', (req, res, next) => referralController.rejectReferral(req, res).catch(next));
+
 router.get("/:id", referralController.getReferralById);
 router.get("/:id/recommendations", referralController.getRecommendations);
 router.post("/:id/send", referralController.sendReferral);
 router.post("/:id/cancel", referralController.cancelReferral);
-
-router.get('/incoming', authorize('hospital_admin'), (req, res, next) => referralController.getIncomingReferrals(req, res).catch(next));
-router.post('/:id/accept', authorize('hospital_admin'), (req, res, next) => referralController.acceptReferral(req, res).catch(next));
-router.post('/:id/reject', authorize('hospital_admin'), (req, res, next) => referralController.rejectReferral(req, res).catch(next));
 
 export default router;

@@ -9,7 +9,7 @@ import { useAuth } from '@/hooks/useAuth';
 export function DashboardLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-
+  
   const handleLogout = async () => {
     await logout();
     navigate('/auth/login');

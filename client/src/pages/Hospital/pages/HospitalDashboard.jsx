@@ -2,7 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { PageHeader } from '@/components/common/PageHeader';
 import { MetricCard } from '@/components/common/MetricCard';
 import { StatusBadge } from '@/components/common/StatusBadge';
-import { Activity, Bed, Users, AlertTriangle, ShieldCheck, Clock, ChevronRight } from 'lucide-react';
+import { Activity, Bed, Users, AlertTriangle, ShieldCheck, Clock, ChevronRight, CheckCircle2, XCircle } from 'lucide-react';
+import { Modal } from '@/components/common/Modal';
+import { Button } from '@/components/common/Button';
 import { motion } from 'framer-motion';
 import { api } from '@/lib/api';
 import { Loader } from '@/components/common/Loader';
@@ -58,6 +60,23 @@ export default function HospitalDashboard() {
   const [stats, setStats] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
+  const [selectedReferral, setSelectedReferral] = useState(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleAction = async (referralId, action) => {
+    setIsProcessing(true);
+    try {
+      await api.post(`/v1/referrals/${referralId}/${action}`);
+      setIsModalOpen(false);
+      setSelectedReferral(null);
+      await fetchStats();
+    } catch (err) {
+      console.error(`Failed to ${action} referral`, err);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
   useEffect(() => {
     fetchStats();
@@ -136,7 +155,10 @@ export default function HospitalDashboard() {
                 return (
                   <SpotlightCard
                     key={row._id}
-                    onClick={() => navigate('/dashboard/hospital/referrals')}
+                    onClick={() => {
+                      setSelectedReferral(row);
+                      setIsModalOpen(true);
+                    }}
                     className="p-4 flex flex-col justify-between"
                   >
                     <div>
@@ -167,7 +189,7 @@ export default function HospitalDashboard() {
                         </p>
                         <p className="text-xs text-muted-foreground truncate">
                           <span className="font-medium text-foreground">Origin: </span>
-                          {originHospital}
+                          {row.fromHospitalId?.hospitalName || 'External Facility'}
                         </p>
                       </div>
                     </div>
@@ -200,6 +222,84 @@ export default function HospitalDashboard() {
           )}
         </div>
       </motion.div>
+
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title="Review Incoming Referral"
+        footer={
+          <div className="flex w-full gap-3 mt-4">
+            <Button
+              disabled={isProcessing}
+              variant="outline"
+              onClick={() => handleAction(selectedReferral?._id, 'reject')}
+              className="flex-1 border-border text-rose-600 hover:bg-rose-500/10 hover:border-rose-500/30"
+            >
+              <XCircle className="w-4 h-4 mr-2" /> Decline Transfer
+            </Button>
+            <Button
+              disabled={isProcessing}
+              onClick={() => handleAction(selectedReferral?._id, 'accept')}
+              className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white"
+            >
+              <CheckCircle2 className="w-4 h-4 mr-2" /> Accept & Allocate Bed
+            </Button>
+          </div>
+        }
+      >
+        {selectedReferral && (
+          <div className="space-y-4">
+            <div className="flex justify-between items-start">
+              <div>
+                <h4 className="font-semibold text-lg">{selectedReferral.patientId?.name || 'Unknown Patient'}</h4>
+                <p className="text-sm text-muted-foreground">ID: #{selectedReferral._id?.slice(-6).toUpperCase()}</p>
+              </div>
+              <StatusBadge status={selectedReferral.priority === 'Critical' ? 'critical' : selectedReferral.priority === 'High' ? 'pending' : 'stable'}>
+                {selectedReferral.priority || 'Medium'}
+              </StatusBadge>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-muted/30 p-3 rounded-lg border border-border/50">
+                <p className="text-xs text-muted-foreground mb-1">Origin Hospital</p>
+                <p className="text-sm font-medium">{selectedReferral.fromHospitalId?.hospitalName || 'External Facility'}</p>
+              </div>
+              <div className="bg-muted/30 p-3 rounded-lg border border-border/50">
+                <p className="text-xs text-muted-foreground mb-1">Referring Doctor</p>
+                <p className="text-sm font-medium">Dr. {selectedReferral.doctorId?.fullName || 'Attending'}</p>
+              </div>
+            </div>
+
+            <div className="bg-muted/30 p-3 rounded-lg border border-border/50">
+              <p className="text-xs text-muted-foreground mb-1">Diagnosis</p>
+              <p className="text-sm font-medium">{selectedReferral.patientId?.diagnosis || selectedReferral.diagnosis || 'Emergency triage in progress'}</p>
+            </div>
+            
+            {selectedReferral.patientId?.requiredResources && Object.values(selectedReferral.patientId.requiredResources).some(v => v === true) && (
+              <div className="bg-muted/30 p-3 rounded-lg border border-border/50">
+                <p className="text-xs text-muted-foreground mb-2">Required Resources</p>
+                <div className="flex flex-wrap gap-2">
+                  {selectedReferral.patientId.requiredResources.needsICU && (
+                    <span className="px-2 py-1 bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 rounded-md text-xs font-semibold">ICU Bed</span>
+                  )}
+                  {selectedReferral.patientId.requiredResources.needsVentilator && (
+                    <span className="px-2 py-1 bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 rounded-md text-xs font-semibold">Ventilator</span>
+                  )}
+                  {selectedReferral.patientId.requiredResources.needsBlood && (
+                    <span className="px-2 py-1 bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20 rounded-md text-xs font-semibold">Blood Required</span>
+                  )}
+                  {selectedReferral.patientId.requiredResources.needsOperationTheatre && (
+                    <span className="px-2 py-1 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 rounded-md text-xs font-semibold">Operation Theatre</span>
+                  )}
+                  {selectedReferral.patientId.requiredResources.needsGeneralBed && (
+                    <span className="px-2 py-1 bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 rounded-md text-xs font-semibold">General Bed</span>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }
