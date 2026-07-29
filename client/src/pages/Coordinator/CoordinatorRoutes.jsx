@@ -6,6 +6,7 @@ import { PageTransition } from '@/components/common/PageTransition';
 const CoordinatorDashboard = lazy(() => import('./pages/CoordinatorDashboard.jsx'));
 const InternalQueue = lazy(() => import('./pages/InternalQueue.jsx'));
 const ReferralDetails = lazy(() => import('./pages/ReferralDetails.jsx'));
+const IncomingReferrals = lazy(() => import('../Hospital/pages/Referrals.jsx'));
 
 export default function CoordinatorRoutes() {
   return (
@@ -15,6 +16,7 @@ export default function CoordinatorRoutes() {
         <Route path="queue" element={<PageTransition><InternalQueue /></PageTransition>} />
         <Route path="history" element={<PageTransition><InternalQueue historyMode={true} /></PageTransition>} />
         <Route path="referrals/:id" element={<PageTransition><ReferralDetails /></PageTransition>} />
+        <Route path="incoming" element={<PageTransition><IncomingReferrals /></PageTransition>} />
       </Routes>
     </Suspense>
   );

@@ -348,9 +348,9 @@ export default function PatientRegistration() {
           </div>
         </div>
 
-        {/* Sticky Action Footer */}
-        <div className="bg-card/90 backdrop-blur-md border border-border p-6 rounded-3xl shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4 sticky bottom-4 z-10">
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        {/* Action Footer */}
+        <div className="bg-background/95 border-t border-border px-4 py-4 sm:px-8 sm:py-6 flex flex-col sm:flex-row items-center justify-between gap-4 w-[calc(100%+2rem)] -ml-4 sm:w-[calc(100%+3rem)] sm:-ml-6 mt-8">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground w-full sm:w-auto">
             <Clock className="w-4 h-4 text-cyan-500 shrink-0" />
             <span>Submitting will instantly notify triage coordinators & update emergency tracking.</span>
           </div>
