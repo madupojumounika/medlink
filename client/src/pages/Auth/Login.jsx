@@ -18,10 +18,10 @@ const loginSchema = z.object({
 });
 
 const roles = [
-  { id: 'hospital_admin', title: 'Hospital Admin', icon: Building, color: 'text-blue-400', bg: 'bg-blue-500/10', border: 'border-blue-500/20', hover: 'hover:border-blue-500/50' },
-  { id: 'doctor', title: 'Doctor', icon: Stethoscope, color: 'text-cyan-400', bg: 'bg-cyan-500/10', border: 'border-cyan-500/20', hover: 'hover:border-cyan-500/50' },
-  { id: 'referral_coordinator', title: 'Referral Coordinator', icon: Activity, color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', hover: 'hover:border-emerald-500/50' },
-  { id: 'ambulance', title: 'Ambulance Driver', icon: Truck, color: 'text-rose-400', bg: 'bg-rose-500/10', border: 'border-rose-500/20', hover: 'hover:border-rose-500/50' },
+  { id: 'hospital_admin', title: 'Hospital Admin', icon: Building, color: 'text-blue-600', hoverBg: 'hover:bg-blue-50', hoverBorder: 'hover:border-blue-200' },
+  { id: 'doctor', title: 'Doctor', icon: Stethoscope, color: 'text-cyan-600', hoverBg: 'hover:bg-cyan-50', hoverBorder: 'hover:border-cyan-200' },
+  { id: 'referral_coordinator', title: 'Referral Coordinator', icon: Activity, color: 'text-emerald-600', hoverBg: 'hover:bg-emerald-50', hoverBorder: 'hover:border-emerald-200' },
+  { id: 'ambulance', title: 'Ambulance Driver', icon: Truck, color: 'text-rose-600', hoverBg: 'hover:bg-rose-50', hoverBorder: 'hover:border-rose-200' },
 ];
 
 export default function Login() {
@@ -74,94 +74,89 @@ export default function Login() {
 
   if (!selectedRole) {
     return (
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col space-y-6 w-full max-w-xl mx-auto">
-        <div className="flex flex-col space-y-2 text-center mb-4">
-          <h1 className="text-3xl font-bold tracking-tight text-white">Select Your Role</h1>
-          <p className="text-sm text-muted-foreground">Choose your portal to login to the MedLink network.</p>
+      <div className="flex flex-col space-y-8 w-full max-w-xl mx-auto p-8 sm:p-10 bg-white/70 backdrop-blur-xl border border-slate-200/60 rounded-3xl shadow-xl animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="flex flex-col space-y-3 text-center mb-2">
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900">Select Your Role</h1>
+          <p className="text-sm text-slate-600">Choose your portal to login to the MedLink network.</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {roles.map((r) => (
-            <div key={r.id} onClick={() => setSelectedRole(r)} className={`cursor-pointer border p-6 rounded-2xl flex flex-col items-center justify-center gap-3 transition-all bg-slate-900/50 ${r.border} ${r.hover} hover:bg-slate-800/50`}>
-              <div className={`p-4 rounded-xl ${r.bg}`}>
+            <div key={r.id} onClick={() => setSelectedRole(r)} className={`group cursor-pointer border p-6 rounded-2xl flex flex-col items-center justify-center gap-4 transition-all duration-300 bg-white border-slate-100 shadow-sm ${r.hoverBg} ${r.hoverBorder}`}>
+              <div className="p-4 rounded-full bg-slate-50 group-hover:scale-110 transition-transform duration-300">
                 <r.icon className={`w-8 h-8 ${r.color}`} />
               </div>
-              <span className="font-semibold text-white">{r.title}</span>
+              <span className="font-semibold text-slate-900">{r.title}</span>
             </div>
           ))}
         </div>
-        <p className="text-center text-sm text-muted-foreground mt-6">
+        <p className="text-center text-sm text-slate-600 mt-6">
           Hospital doesn't have an account?{' '}
-          <Link to="/auth/register" className="font-semibold text-cyan-400 hover:text-cyan-300">Sign up</Link>
+          <Link to="/auth/register" className="font-semibold text-emerald-600 hover:text-emerald-500 transition-colors">Sign up</Link>
         </p>
-      </motion.div>
+      </div>
     );
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.3 }}
-      className="flex flex-col space-y-6 w-full max-w-md mx-auto"
-    >
-      <div className="flex flex-col space-y-2 text-center relative">
-        <button onClick={() => setSelectedRole(null)} className="absolute left-0 top-1 text-muted-foreground hover:text-white transition-colors">
-          <ArrowLeft className="w-6 h-6" />
+    <div className="flex flex-col space-y-6 w-full max-w-md mx-auto p-8 sm:p-10 bg-white/70 backdrop-blur-xl border border-slate-200/60 rounded-3xl shadow-xl animate-in fade-in zoom-in-95 duration-300">
+      <div className="flex flex-col space-y-3 text-center relative mb-4">
+        <button onClick={() => setSelectedRole(null)} className="absolute left-0 top-1 text-slate-500 hover:text-slate-900 transition-colors">
+          <ArrowLeft className="w-5 h-5" />
         </button>
-        <h1 className="text-3xl font-bold tracking-tight text-white">{selectedRole.title} Login</h1>
-        <p className="text-sm text-muted-foreground">
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900">{selectedRole.title} Login</h1>
+        <p className="text-sm text-slate-600">
           Enter your credentials to access your account
         </p>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
         {errorMsg && (
-          <div className="p-3 text-sm font-medium text-destructive bg-destructive/10 rounded-md border border-destructive/20 text-center">
+          <div className="p-3 text-sm font-medium text-rose-600 bg-rose-50 rounded-lg border border-rose-200 text-center">
             {errorMsg}
           </div>
         )}
 
         <div className="space-y-2">
-          <Label htmlFor="email">{selectedRole?.id === 'doctor' ? 'User ID or Email' : 'Email'}</Label>
+          <Label htmlFor="email" className="text-slate-700 font-medium">{selectedRole?.id === 'doctor' ? 'User ID or Email' : 'Email'}</Label>
           <div className="relative">
-            <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+            <Mail className="absolute left-3 top-3.5 h-4 w-4 text-slate-400" />
             <Input
               id="email"
               type={selectedRole?.id === 'doctor' ? 'text' : 'email'}
               placeholder={selectedRole?.id === 'doctor' ? 'e.g. sarah492 or name@example.com' : 'name@example.com'}
-              className="pl-9"
+              className="pl-10 bg-white border-slate-200 focus:border-emerald-500 text-slate-900 placeholder:text-slate-400 h-11 rounded-xl shadow-sm"
               disabled={isLoading}
               {...register('email')}
             />
           </div>
           {errors.email && (
-            <p className="text-sm font-medium text-destructive">{errors.email.message}</p>
+            <p className="text-sm font-medium text-rose-600">{errors.email.message}</p>
           )}
         </div>
 
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password" className="text-slate-700 font-medium">Password</Label>
             <Link
               to="/auth/forgot-password"
-              className="text-sm font-medium text-cyan-400 hover:text-cyan-300 transition-colors"
+              className="text-sm font-medium text-emerald-600 hover:text-emerald-500 transition-colors"
             >
               Forgot password?
             </Link>
           </div>
           <div className="relative">
-            <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+            <Lock className="absolute left-3 top-3.5 h-4 w-4 text-slate-400" />
             <Input
               id="password"
               type={showPassword ? 'text' : 'password'}
               placeholder="••••••••"
-              className="pl-9 pr-10"
+              className="pl-10 pr-10 bg-white border-slate-200 focus:border-emerald-500 text-slate-900 placeholder:text-slate-400 h-11 rounded-xl shadow-sm"
               disabled={isLoading}
               {...register('password')}
             />
             <button
               type="button"
-              className="absolute right-3 top-3 text-muted-foreground hover:text-foreground"
+              className="absolute right-3 top-3.5 text-slate-400 hover:text-slate-600 transition-colors"
               onClick={() => setShowPassword(!showPassword)}
               tabIndex={-1}
             >
@@ -169,23 +164,24 @@ export default function Login() {
             </button>
           </div>
           {errors.password && (
-            <p className="text-sm font-medium text-destructive">{errors.password.message}</p>
+            <p className="text-sm font-medium text-rose-600">{errors.password.message}</p>
           )}
         </div>
 
-        <div className="flex items-center space-x-2 pb-2">
+        <div className="flex items-center space-x-3 pb-4">
           <Checkbox
             id="rememberMe"
             checked={rememberMe}
             onChange={(e) => setValue('rememberMe', e.target.checked)}
             disabled={isLoading}
+            className="border-slate-300 data-[state=checked]:bg-emerald-600 data-[state=checked]:border-emerald-600"
           />
-          <Label htmlFor="rememberMe" className="font-normal cursor-pointer text-muted-foreground">
+          <Label htmlFor="rememberMe" className="font-medium cursor-pointer text-slate-600 text-sm">
             Remember me for 30 days
           </Label>
         </div>
 
-        <Button type="submit" className="w-full" disabled={isLoading}>
+        <Button type="submit" className="w-full h-11 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-medium shadow-sm transition-colors" disabled={isLoading}>
           {isLoading ? (
             <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Signing in...</>
           ) : (
@@ -193,6 +189,6 @@ export default function Login() {
           )}
         </Button>
       </form>
-    </motion.div>
+    </div>
   );
 }
