@@ -7,10 +7,15 @@ const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://localhost:8000';
 class AIService {
   async checkAIHealth() {
     try {
-      const response = await axios.get(`${AI_SERVICE_URL}/health`, { timeout: 5000 });
+      const response = await axios.get(`${AI_SERVICE_URL}/health`, {
+        timeout: 30000, // 30 seconds
+      });
+
       return response.data?.success || false;
     } catch (error) {
-      logger.warn(`[AI_STATUS] AI Service is temporarily offline or unreachable: ${error.message}`);
+      logger.warn(
+        `[AI_STATUS] AI Service is temporarily offline or unreachable: ${error.message}`
+      );
       return false;
     }
   }
@@ -28,7 +33,7 @@ class AIService {
         spo2: patientData.vitals.spo2,
         respiratory_rate: patientData.vitals.respiratoryRate,
         temperature: patientData.vitals.temperature,
-      }, { timeout: 10000 });
+      }, { timeout: 30000 });
       
       const executionTime = (performance.now() - startTime).toFixed(2);
       logger.info(`[AI_RESPONSE] Successfully received prediction in ${executionTime}ms. Result: ${response.data.prediction?.severity}`);
@@ -82,7 +87,7 @@ class AIService {
         icu_available: requestData.icuAvailable,
         ambulance_available: requestData.ambulanceAvailable,
         waiting_time_minutes: requestData.waitingTimeMinutes,
-      }, { timeout: 10000 });
+      }, { timeout: 30000 });
       
       const executionTime = (performance.now() - startTime).toFixed(2);
       logger.info(`[AI_RESPONSE] Successfully received referral priority in ${executionTime}ms. Priority: ${response.data.priority}`);
