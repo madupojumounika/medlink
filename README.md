@@ -185,7 +185,7 @@ npm run dev
 AI Service
 
 ```bash
-uvicorn app:app --reload
+uvicorn main:app --reload
 ```
 
 ## Contribution Guidelines
