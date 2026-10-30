@@ -15,6 +15,13 @@ export const connectDB = async () => {
   } catch (error) {
     console.error("Database Connection Failed");
     console.error(error);
+    if (error.code === "ENOTFOUND" || error.syscall === "querySrv") {
+      console.error("\n[MongoDB Troubleshooting Tips]:");
+      console.error("1. MongoDB Atlas Cluster Status: Verify your cluster is not PAUSED in cloud.mongodb.com.");
+      console.error("2. IP Whitelist: In Atlas -> Network Access, ensure 0.0.0.0/0 (Allow from anywhere) is added.");
+      console.error("3. Render MONGO_URI: Ensure the URI matches your cluster and password does not contain unencoded special characters.");
+      console.error("4. Non-SRV format: You can also use the standard replica set connection string instead of mongodb+srv://\n");
+    }
     process.exit(1);
   }
 };

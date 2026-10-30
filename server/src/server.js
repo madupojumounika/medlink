@@ -1,9 +1,17 @@
 import http from "http";
+import dns from "node:dns";
 import app from "./app.js";
 import { env } from "./config/env.js";
 import { logger } from "./utils/logger.js";
 import { connectDB } from "./config/db.js";
 import { aiService } from "./services/ai.service.js";
+
+// Set DNS servers to Google and Cloudflare to resolve MongoDB Atlas SRV records in cloud environments (Render)
+try {
+  dns.setServers(["8.8.8.8", "1.1.1.1"]);
+} catch (e) {
+  console.warn("[DNS]: Unable to set custom DNS servers", e.message);
+}
 
 process.on("uncaughtException", (err) => {
   console.error("[Uncaught Exception]: Shutting down application...");

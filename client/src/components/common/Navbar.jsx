@@ -39,7 +39,7 @@ export function Navbar() {
           <Link to="/auth/register">
             <Button className="relative bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white border-0 shadow-[0_4px_15px_rgba(16,185,129,0.25)] hover:shadow-[0_6px_20px_rgba(16,185,129,0.4)] rounded-lg px-5 py-1.5 h-9 text-xs font-bold transition-all overflow-hidden group">
               <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"></div>
-              Request Demo
+              Sign Up
             </Button>
           </Link>
         </div>

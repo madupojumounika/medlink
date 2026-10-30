@@ -25,7 +25,8 @@ const app = express();
 
 app.use(helmet());
 
-const allowedOrigins = [env.CLIENT_URL, "http://localhost:5173", "http://127.0.0.1:5173"];
+const clientUrl = env.CLIENT_URL ? env.CLIENT_URL.replace(/\/$/, "") : "";
+const allowedOrigins = [clientUrl, "http://localhost:5173", "http://127.0.0.1:5173"].filter(Boolean);
 
 app.use(
   cors({
